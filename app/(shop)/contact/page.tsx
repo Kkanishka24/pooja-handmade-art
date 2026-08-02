@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import type { Metadata } from "next";
 import {
   Mail,
   Phone,
@@ -90,9 +89,9 @@ export default function ContactPage() {
       </div>
 
       <div className="container-brand py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-stretch">
           {/* Contact Info */}
-          <div className="space-y-6">
+          <div className="space-y-6 flex flex-col justify-between">
             <div className="bg-white rounded-3xl p-6 shadow-soft">
               <h2 className="font-display font-semibold text-brand-brown text-xl mb-5">
                 Contact Details
@@ -157,19 +156,39 @@ export default function ContactPage() {
               </h3>
               <div className="flex gap-3">
                 {[
-                  { emoji: "📷", href: "https://instagram.com", label: "Instagram" },
-                  { emoji: "👍", href: "https://facebook.com", label: "Facebook" },
-                ].map(({ emoji, href, label }) => (
+                  {
+                    icon: (props: React.SVGProps<SVGSVGElement>) => (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                        <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                        <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                      </svg>
+                    ),
+                    href: "https://instagram.com",
+                    label: "Instagram",
+                    hoverStyle: "hover:bg-[#E4405F] hover:text-white border-transparent",
+                  },
+                  {
+                    icon: (props: React.SVGProps<SVGSVGElement>) => (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                      </svg>
+                    ),
+                    href: "https://facebook.com",
+                    label: "Facebook",
+                    hoverStyle: "hover:bg-[#1877F2] hover:text-white border-transparent",
+                  },
+                ].map(({ icon: Icon, href, label, hoverStyle }) => (
                   <a
                     key={label}
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={label}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-brand-cream hover:bg-brand-pink-light text-brand-muted hover:text-brand-brown transition-all duration-200 text-sm font-medium"
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-brand-cream border border-brand-beige text-brand-brown font-semibold text-sm transition-all duration-200 ${hoverStyle} shadow-soft`}
                   >
-                    <span>{emoji}</span>
-                    {label}
+                    <Icon className="w-4 h-4 shrink-0" />
+                    <span>{label}</span>
                   </a>
                 ))}
               </div>
@@ -197,16 +216,16 @@ export default function ContactPage() {
 
           {/* Contact Form */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-3xl p-8 shadow-soft">
+            <div className="bg-white rounded-3xl p-8 shadow-soft h-full flex flex-col justify-between">
               {submitted ? (
-                <div className="text-center py-12">
+                <div className="text-center py-12 flex-1 flex flex-col justify-center items-center">
                   <div className="w-20 h-20 rounded-full bg-brand-green-light flex items-center justify-center mx-auto mb-5">
                     <CheckCircle className="w-9 h-9 text-brand-green-dark" />
                   </div>
                   <h3 className="font-display font-bold text-2xl text-brand-brown mb-2">
                     Message Sent! 🎉
                   </h3>
-                  <p className="text-brand-muted">
+                  <p className="text-brand-muted max-w-sm">
                     Thank you for reaching out! We&apos;ll get back to you within 24
                     hours.
                   </p>
@@ -218,99 +237,99 @@ export default function ContactPage() {
                   </button>
                 </div>
               ) : (
-                <>
-                  <h2 className="font-display font-semibold text-brand-brown text-2xl mb-6">
+                <div className="flex-1 flex flex-col">
+                  <h2 className="font-display font-semibold text-brand-brown text-2xl mb-6 shrink-0">
                     Send a Message
                   </h2>
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div>
+                  <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col">
+                    <div className="space-y-5 flex-1 flex flex-col">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 shrink-0">
+                        <div>
+                          <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
+                            Your Name *
+                          </label>
+                          <input
+                            {...register("name")}
+                            placeholder="Priya Sharma"
+                            id="contact-name"
+                            className="input-brand"
+                          />
+                          {errors.name && (
+                            <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+                          )}
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
+                            Email Address *
+                          </label>
+                          <input
+                            {...register("email")}
+                            type="email"
+                            placeholder="you@example.com"
+                            id="contact-email"
+                            className="input-brand"
+                          />
+                          {errors.email && (
+                            <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="shrink-0">
                         <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
-                          Your Name *
+                          Subject *
                         </label>
-                        <input
-                          {...register("name")}
-                          placeholder="Priya Sharma"
-                          id="contact-name"
-                          className="input-brand"
-                        />
-                        {errors.name && (
-                          <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+                        <select
+                          {...register("subject")}
+                          id="contact-subject"
+                          className="input-brand cursor-pointer bg-white"
+                        >
+                          <option value="">Select a subject...</option>
+                          <option value="custom-order">Custom Order Inquiry</option>
+                          <option value="product-query">Product Question</option>
+                          <option value="order-issue">Order Issue</option>
+                          <option value="bulk-order">Bulk / Corporate Order</option>
+                          <option value="general">General Inquiry</option>
+                        </select>
+                        {errors.subject && (
+                          <p className="text-red-500 text-xs mt-1">{errors.subject.message}</p>
                         )}
                       </div>
+
                       <div>
                         <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
-                          Email Address *
+                          Message *
                         </label>
-                        <input
-                          {...register("email")}
-                          type="email"
-                          placeholder="you@example.com"
-                          id="contact-email"
-                          className="input-brand"
+                        <textarea
+                          {...register("message")}
+                          rows={8}
+                          placeholder="Tell us what you need — we're happy to help!"
+                          id="contact-message"
+                          className="input-brand resize-none"
                         />
-                        {errors.email && (
-                          <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+                        {errors.message && (
+                          <p className="text-red-500 text-xs mt-1">{errors.message.message}</p>
                         )}
                       </div>
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
-                        Subject *
-                      </label>
-                      <select
-                        {...register("subject")}
-                        id="contact-subject"
-                        className="input-brand"
-                      >
-                        <option value="">Select a subject...</option>
-                        <option value="custom-order">Custom Order Inquiry</option>
-                        <option value="product-query">Product Question</option>
-                        <option value="order-issue">Order Issue</option>
-                        <option value="bulk-order">Bulk / Corporate Order</option>
-                        <option value="general">General Inquiry</option>
-                      </select>
-                      {errors.subject && (
-                        <p className="text-red-500 text-xs mt-1">{errors.subject.message}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
-                        Message *
-                      </label>
-                      <textarea
-                        {...register("message")}
-                        rows={5}
-                        placeholder="Tell us what you need — we're happy to help!"
-                        id="contact-message"
-                        className="input-brand resize-none"
-                      />
-                      {errors.message && (
-                        <p className="text-red-500 text-xs mt-1">{errors.message.message}</p>
-                      )}
                     </div>
 
                     <button
                       type="submit"
                       disabled={loading}
                       id="contact-submit"
-                      className="btn-primary w-full justify-center py-4"
+                      className="btn-primary w-full justify-center py-4 text-base shadow-pink mt-2.5"
                     >
                       {loading ? (
-                        <span className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-brand-brown/30 border-t-brand-brown rounded-full animate-spin" />
-                          Sending...
-                        </span>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       ) : (
                         <>
-                          <Send className="w-4 h-4" /> Send Message
+                          <Send className="w-4 h-4" />
+                          Send Message
                         </>
                       )}
                     </button>
                   </form>
-                </>
+                </div>
               )}
             </div>
           </div>

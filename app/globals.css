@@ -189,6 +189,7 @@ h1, h2, h3, h4, h5, h6 {
     background-color: white; border-radius: 1.5rem;
     box-shadow: var(--shadow-soft); overflow: hidden;
     transition: all 0.3s;
+    height: 100%; display: flex; flex-direction: column; justify-content: space-between;
   }
   .product-card:hover { box-shadow: var(--shadow-card-hover); transform: translateY(-4px); }
 
