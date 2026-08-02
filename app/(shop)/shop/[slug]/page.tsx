@@ -1,16 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import {
   Star,
   Heart,
   ShoppingCart,
   Share2,
-  ChevronLeft,
-  ChevronRight,
   Check,
   Truck,
   Shield,
@@ -23,16 +20,17 @@ import { useWishlistStore } from "@/store/wishlistStore";
 import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import ProductCard from "@/components/shop/ProductCard";
+import ProductImageGallery from "@/components/shop/ProductImageGallery";
 
 export default function ProductDetailPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const product = products.find((p) => p.slug === params.slug);
+  const { slug } = use(params);
+  const product = products.find((p) => p.slug === slug);
   if (!product) notFound();
 
-  const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState(
     product.colors?.[0] || ""
@@ -93,73 +91,23 @@ export default function ProductDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Images */}
           <div>
-            {/* Main Image */}
-            <div className="relative rounded-4xl overflow-hidden bg-white shadow-card mb-4 aspect-square">
-              <Image
-                src={product.images[selectedImage]}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-              />
-              {/* Badges */}
-              <div className="absolute top-4 left-4 flex flex-col gap-2">
-                {product.is_new && (
-                  <span className="badge-green text-xs">New ✨</span>
-                )}
-                {product.is_bestseller && (
-                  <span className="badge-pink text-xs">⭐ Bestseller</span>
-                )}
-                {discount > 0 && (
-                  <span className="badge-sale text-xs">-{discount}%</span>
-                )}
-              </div>
-
-              {/* Navigation arrows */}
-              {product.images.length > 1 && (
+            <ProductImageGallery
+              images={product.images}
+              productName={product.name}
+              badges={
                 <>
-                  <button
-                    onClick={() =>
-                      setSelectedImage((i) =>
-                        (i - 1 + product.images.length) % product.images.length
-                      )
-                    }
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-soft hover:bg-white transition-colors"
-                    aria-label="Previous image"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() =>
-                      setSelectedImage((i) => (i + 1) % product.images.length)
-                    }
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-soft hover:bg-white transition-colors"
-                    aria-label="Next image"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Thumbnails */}
-            <div className="flex gap-3">
-              {product.images.map((img, i) => (
-                <button
-                  key={i}
-                  onClick={() => setSelectedImage(i)}
-                  className={cn(
-                    "relative w-20 h-20 rounded-2xl overflow-hidden border-2 transition-all duration-200",
-                    i === selectedImage
-                      ? "border-brand-pink shadow-pink"
-                      : "border-transparent hover:border-brand-pink-light"
+                  {product.is_new && (
+                    <span className="badge-green text-xs">New ✨</span>
                   )}
-                  aria-label={`View image ${i + 1}`}
-                >
-                  <Image src={img} alt="" fill className="object-cover" />
-                </button>
-              ))}
-            </div>
+                  {product.is_bestseller && (
+                    <span className="badge-pink text-xs">⭐ Bestseller</span>
+                  )}
+                  {discount > 0 && (
+                    <span className="badge-sale text-xs">-{discount}%</span>
+                  )}
+                </>
+              }
+            />
           </div>
 
           {/* Product Info */}
