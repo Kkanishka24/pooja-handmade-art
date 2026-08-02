@@ -58,7 +58,7 @@ const processSteps = [
 
 const values = [
   {
-    emoji: "🧶",
+    emoji: "logo",
     title: "Handmade with Intention",
     description:
       "Every product is made one at a time, by hand. No factories, no shortcuts.",
@@ -137,8 +137,13 @@ export default function AboutPage() {
                 </div>
               </div>
               {/* Decorative sticker */}
-              <div className="absolute -top-4 -left-4 w-16 h-16 rounded-full bg-brand-pink flex items-center justify-center text-2xl shadow-pink animate-float">
-                🧶
+              <div className="absolute -top-4 -left-4 w-16 h-16 rounded-full bg-brand-pink flex items-center justify-center shadow-pink animate-float">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/logo.png?v=2"
+                  alt="Pooja Handmade Art"
+                  className="w-8 h-8 rounded-full object-cover"
+                />
               </div>
             </div>
 
@@ -202,7 +207,18 @@ export default function AboutPage() {
                 key={v.title}
                 className="card-soft text-center hover:shadow-card transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="text-4xl mb-4">{v.emoji}</div>
+                {v.emoji === "logo" ? (
+                  <div className="w-14 h-14 rounded-full bg-brand-pink flex items-center justify-center mx-auto mb-4">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/logo.png?v=2"
+                      alt={v.title}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="text-4xl mb-4">{v.emoji}</div>
+                )}
                 <h3 className="font-display font-semibold text-brand-brown mb-2 text-lg">
                   {v.title}
                 </h3>
@@ -261,7 +277,12 @@ export default function AboutPage() {
       {/* CTA Banner */}
       <section className="section-pad bg-gradient-to-br from-brand-pink-light via-brand-cream to-brand-green-light">
         <div className="container-brand text-center">
-          <div className="text-5xl mb-4">🧶</div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png?v=2"
+            alt="Pooja Handmade Art"
+            className="w-16 h-16 rounded-full object-cover mx-auto mb-4"
+          />
           <h2 className="section-title mb-4">Ready to Own Something Handmade?</h2>
           <p className="section-subtitle mb-8 max-w-lg mx-auto">
             Browse our collection of premium felt products or reach out for a

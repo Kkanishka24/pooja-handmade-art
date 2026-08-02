@@ -265,7 +265,12 @@ function ShopContent() {
             {/* Product Grid */}
             {filtered.length === 0 ? (
               <div className="text-center py-20">
-                <p className="text-5xl mb-4">🧶</p>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/logo.png?v=2"
+                  alt="Pooja Handmade Art"
+                  className="w-16 h-16 rounded-full object-cover mx-auto mb-4"
+                />
                 <h3 className="font-display font-semibold text-brand-brown text-xl mb-2">
                   No products found
                 </h3>

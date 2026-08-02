@@ -61,7 +61,12 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-4 py-16">
       {/* Decorative elements */}
-      <div className="absolute top-20 left-10 text-5xl opacity-20 animate-float">🧶</div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/logo.png?v=2"
+        alt=""
+        className="absolute top-20 left-10 w-16 h-16 rounded-full object-cover opacity-20 animate-float"
+      />
       <div className="absolute bottom-20 right-10 text-4xl opacity-20 animate-bounce-soft">✨</div>
       <div className="absolute top-1/3 right-1/4 text-3xl opacity-10 animate-float animation-delay-400">🌸</div>
 
@@ -69,7 +74,12 @@ export default function AuthPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-full bg-gradient-pink flex items-center justify-center shadow-pink mx-auto mb-4">
-            <span className="text-3xl">🧶</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png?v=2"
+              alt="Pooja Handmade Art"
+              className="w-10 h-10 rounded-full object-cover"
+            />
           </div>
           <h1 className="font-display font-bold text-2xl text-brand-brown">
             Pooja Handmade Art

@@ -34,9 +34,12 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-full bg-brand-pink flex items-center justify-center">
-                <span className="text-xl">🧶</span>
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.png?v=2"
+                alt="Pooja Handmade Art"
+                className="w-10 h-10 rounded-full object-cover"
+              />
               <div>
                 <div className="font-display font-bold text-white text-lg leading-none">
                   Pooja

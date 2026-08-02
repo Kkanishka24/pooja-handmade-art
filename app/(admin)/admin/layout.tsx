@@ -48,9 +48,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         >
           {/* Logo */}
           <div className="p-5 border-b border-white/10 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-brand-pink flex items-center justify-center text-lg">
-              🧶
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png?v=2"
+              alt="Pooja Handmade Art"
+              className="w-9 h-9 rounded-xl object-cover"
+            />
             <div>
               <p className="text-white font-display font-bold text-sm leading-none">
                 Pooja Handmade

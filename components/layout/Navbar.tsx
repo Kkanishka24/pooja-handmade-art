@@ -76,9 +76,12 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 rounded-full bg-gradient-pink flex items-center justify-center shadow-pink group-hover:scale-110 transition-transform duration-300">
-                <span className="text-xl">🧶</span>
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.png?v=2"
+                alt="Pooja Handmade Art"
+                className="w-10 h-10 rounded-full object-cover shadow-pink group-hover:scale-110 transition-transform duration-300"
+              />
               <div className="leading-tight">
                 <div className="font-display font-bold text-brand-brown text-lg leading-none">
                   Pooja

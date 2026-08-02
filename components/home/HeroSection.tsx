@@ -126,8 +126,13 @@ export default function HeroSection() {
             </div>
 
             {/* Floating decorative elements */}
-            <div className="absolute -top-4 -right-4 w-16 h-16 bg-brand-yellow rounded-full flex items-center justify-center text-2xl shadow-card animate-bounce-soft">
-              🧶
+            <div className="absolute -top-4 -right-4 w-16 h-16 bg-brand-yellow rounded-full flex items-center justify-center shadow-card animate-bounce-soft">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.png?v=2"
+                alt="Pooja Handmade Art"
+                className="w-8 h-8 rounded-full object-cover"
+              />
             </div>
             <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-brand-pink rounded-full flex items-center justify-center text-xl shadow-card animate-float">
               ✨
