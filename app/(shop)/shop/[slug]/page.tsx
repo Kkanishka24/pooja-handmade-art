@@ -322,16 +322,19 @@ export default function ProductDetailPage({
                   <div className="flex items-start gap-3">
                     <MessageCircle className="w-5 h-5 text-brand-terracotta mt-0.5 shrink-0" />
                     <div>
-                      <p className="text-brand-muted text-xs mt-1">
-                           Want a personalized version? Contact us via WhatsApp for
-                           custom color combinations or personalized messages.
+                      <p className="font-semibold text-brand-brown text-sm">
+                        Custom Orders Available
                       </p>
-
-                         <a href="https://wa.me/919876543210"
-                          className="inline-flex items-center gap-1.5 mt-2 text-xs font-semibold text-brand-terracotta hover:underline"
-                                >
-                            WhatsApp Us →
-                           </a>
+                      <p className="text-brand-muted text-xs mt-1">
+                        Want a personalized version? Contact us via WhatsApp for
+                        custom color combinations or personalized messages.
+                      </p>
+                      <a
+                        href="https://wa.me/919876543210"
+                        className="inline-flex items-center gap-1.5 mt-2 text-xs font-semibold text-brand-terracotta hover:underline"
+                      >
+                        WhatsApp Us →
+                      </a>
                     </div>
                   </div>
                 </div>
