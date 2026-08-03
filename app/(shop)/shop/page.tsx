@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { SlidersHorizontal, Grid3X3, List, X, RotateCcw, Check, Sparkles } from "lucide-react";
+import { SlidersHorizontal, Grid3X3, List, X, RotateCcw, Check } from "lucide-react";
 import ProductCard from "@/components/shop/ProductCard";
 import ProductCardSkeleton from "@/components/ui/ProductCardSkeleton";
 import { products, categories } from "@/lib/data";
@@ -19,7 +19,7 @@ const sortOptions = [
 const availableColors = [
   { name: "Blush Pink", hex: "#f4a7b9" },
   { name: "Sage Green", hex: "#a8c5a0" },
-  { name: "Pastel Rainbow", hex: "#f5d080" },
+  { name: "Rainbow", hex: "#f5d080" },
   { name: "Terracotta", hex: "#d4956a" },
   { name: "Lavender", hex: "#c5b8d8" },
   { name: "White", hex: "#ffffff" },
@@ -52,6 +52,18 @@ function ShopContent() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Sync state from URL when navigating client-side (e.g. search from modal)
+  useEffect(() => {
+    setSelectedCategory(searchParams.get("category") || "all");
+    setSortBy(searchParams.get("sort") || "newest");
+    const min = Number(searchParams.get("minPrice")) || 0;
+    const max = Number(searchParams.get("maxPrice")) || 2000;
+    setPriceRange([min, max]);
+    setSelectedColor(searchParams.get("color") || "");
+    setInStockOnly(searchParams.get("inStock") === "true");
+    setSearchQuery(searchParams.get("search") || "");
+  }, [searchParams]);
 
   // Sync URL search params when filters change
   useEffect(() => {
