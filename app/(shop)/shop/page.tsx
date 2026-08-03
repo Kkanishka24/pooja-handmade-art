@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { SlidersHorizontal, Grid3X3, List, X } from "lucide-react";
+import { useState, useMemo, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { SlidersHorizontal, Grid3X3, List, X, RotateCcw, Check, Sparkles } from "lucide-react";
 import ProductCard from "@/components/shop/ProductCard";
+import ProductCardSkeleton from "@/components/ui/ProductCardSkeleton";
 import { products, categories } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -15,17 +16,73 @@ const sortOptions = [
   { value: "rating", label: "Highest Rated" },
 ];
 
+const availableColors = [
+  { name: "Blush Pink", hex: "#f4a7b9" },
+  { name: "Sage Green", hex: "#a8c5a0" },
+  { name: "Pastel Rainbow", hex: "#f5d080" },
+  { name: "Terracotta", hex: "#d4956a" },
+  { name: "Lavender", hex: "#c5b8d8" },
+  { name: "White", hex: "#ffffff" },
+];
+
 function ShopContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams.get("category") || "all"
   );
   const [sortBy, setSortBy] = useState(searchParams.get("sort") || "newest");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>(() => {
+    const min = Number(searchParams.get("minPrice")) || 0;
+    const max = Number(searchParams.get("maxPrice")) || 2000;
+    return [min, max];
+  });
+  const [selectedColor, setSelectedColor] = useState<string>(
+    searchParams.get("color") || ""
+  );
+  const [inStockOnly, setInStockOnly] = useState<boolean>(
+    searchParams.get("inStock") === "true"
+  );
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || ""
+  );
+
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [view, setView] = useState<"grid" | "list">("grid");
-  const [searchQuery] = useState(searchParams.get("search") || "");
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Sync URL search params when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (selectedCategory !== "all") params.set("category", selectedCategory);
+    if (sortBy !== "newest") params.set("sort", sortBy);
+    if (priceRange[0] > 0) params.set("minPrice", priceRange[0].toString());
+    if (priceRange[1] < 2000) params.set("maxPrice", priceRange[1].toString());
+    if (selectedColor) params.set("color", selectedColor);
+    if (inStockOnly) params.set("inStock", "true");
+    if (searchQuery) params.set("search", searchQuery);
+
+    const queryString = params.toString();
+    const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
+    router.replace(newUrl, { scroll: false });
+  }, [selectedCategory, sortBy, priceRange, selectedColor, inStockOnly, searchQuery, pathname, router]);
+
+  // Simulate short loading skeleton when switching categories or sorting
+  const handleCategoryChange = (catSlug: string) => {
+    setIsLoading(true);
+    setSelectedCategory(catSlug);
+    setTimeout(() => setIsLoading(false), 250);
+  };
+
+  const handleSortChange = (sortVal: string) => {
+    setIsLoading(true);
+    setSortBy(sortVal);
+    setTimeout(() => setIsLoading(false), 200);
+  };
+
+  // Filter products
   const filtered = useMemo(() => {
     let result = [...products];
 
@@ -34,7 +91,8 @@ function ShopContent() {
       result = result.filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
-          p.category.name.toLowerCase().includes(q)
+          p.category.name.toLowerCase().includes(q) ||
+          p.tags.some((t) => t.includes(q))
       );
     }
 
@@ -45,6 +103,16 @@ function ShopContent() {
     result = result.filter(
       (p) => p.price >= priceRange[0] && p.price <= priceRange[1]
     );
+
+    if (selectedColor) {
+      result = result.filter((p) =>
+        p.colors?.some((c) => c.toLowerCase().includes(selectedColor.toLowerCase()))
+      );
+    }
+
+    if (inStockOnly) {
+      result = result.filter((p) => p.stock > 0);
+    }
 
     switch (sortBy) {
       case "price_asc":
@@ -67,22 +135,58 @@ function ShopContent() {
     }
 
     return result;
-  }, [selectedCategory, sortBy, priceRange, searchQuery]);
+  }, [selectedCategory, sortBy, priceRange, selectedColor, inStockOnly, searchQuery]);
+
+  // Active filters list
+  const hasActiveFilters =
+    selectedCategory !== "all" ||
+    priceRange[0] > 0 ||
+    priceRange[1] < 2000 ||
+    selectedColor !== "" ||
+    inStockOnly ||
+    searchQuery !== "";
+
+  const clearAllFilters = () => {
+    setIsLoading(true);
+    setSelectedCategory("all");
+    setPriceRange([0, 2000]);
+    setSelectedColor("");
+    setInStockOnly(false);
+    setSearchQuery("");
+    setTimeout(() => setIsLoading(false), 200);
+  };
 
   return (
     <div className="bg-brand-cream min-h-screen">
-      {/* Header */}
+      {/* Page Header */}
       <div className="bg-white border-b border-brand-beige">
         <div className="container-brand py-8">
-          <h1 className="section-title">
-            {selectedCategory === "all"
-              ? "All Products"
-              : categories.find((c) => c.slug === selectedCategory)?.name ||
-                "Shop"}
-          </h1>
-          <p className="section-subtitle text-sm mt-1">
-            {filtered.length} handcrafted products
-          </p>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="section-title">
+                {selectedCategory === "all"
+                  ? "All Handcrafted Products"
+                  : categories.find((c) => c.slug === selectedCategory)?.name ||
+                    "Shop"}
+              </h1>
+              <p className="section-subtitle text-sm mt-1 flex items-center gap-2">
+                <span>{filtered.length} handcrafted items</span>
+                {searchQuery && (
+                  <span className="text-brand-pink-dark font-medium">
+                    matching &quot;{searchQuery}&quot;
+                  </span>
+                )}
+              </p>
+            </div>
+            {hasActiveFilters && (
+              <button
+                onClick={clearAllFilters}
+                className="btn-ghost text-xs border border-brand-beige self-start md:self-auto flex items-center gap-1.5 px-3 py-1.5"
+              >
+                <RotateCcw className="w-3.5 h-3.5" /> Reset All Filters
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -95,13 +199,14 @@ function ShopContent() {
               filtersOpen ? "block" : "hidden lg:block"
             )}
           >
-            <div className="bg-white rounded-3xl p-6 shadow-soft sticky top-28">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="font-display font-semibold text-brand-brown text-lg">
+            <div className="bg-white rounded-3xl p-6 shadow-soft sticky top-28 border border-brand-beige/60 space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="font-display font-semibold text-brand-brown text-lg flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-brand-pink-dark" />
                   Filters
                 </h2>
                 <button
-                  className="lg:hidden text-brand-muted"
+                  className="lg:hidden text-brand-muted hover:text-brand-brown"
                   onClick={() => setFiltersOpen(false)}
                   aria-label="Close filters"
                 >
@@ -109,36 +214,37 @@ function ShopContent() {
                 </button>
               </div>
 
-              {/* Categories */}
-              <div className="mb-6">
+              {/* Category Filter */}
+              <div>
                 <p className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-3">
-                  Category
+                  Categories
                 </p>
                 <div className="space-y-1">
                   <button
-                    onClick={() => setSelectedCategory("all")}
+                    onClick={() => handleCategoryChange("all")}
                     className={cn(
-                      "w-full text-left px-3 py-2 rounded-xl text-sm transition-colors duration-200",
+                      "w-full text-left px-3 py-2 rounded-xl text-sm transition-colors duration-200 flex items-center justify-between",
                       selectedCategory === "all"
-                        ? "bg-brand-pink text-brand-brown font-semibold"
+                        ? "bg-brand-pink text-brand-brown font-semibold shadow-soft"
                         : "text-brand-muted hover:bg-brand-cream-dark hover:text-brand-brown"
                     )}
                   >
-                    All Products
+                    <span>All Products</span>
+                    <span className="text-xs opacity-70">{products.length}</span>
                   </button>
                   {categories.map((cat) => (
                     <button
                       key={cat.id}
-                      onClick={() => setSelectedCategory(cat.slug)}
+                      onClick={() => handleCategoryChange(cat.slug)}
                       className={cn(
                         "w-full text-left px-3 py-2 rounded-xl text-sm transition-colors duration-200 flex items-center justify-between",
                         selectedCategory === cat.slug
-                          ? "bg-brand-pink text-brand-brown font-semibold"
+                          ? "bg-brand-pink text-brand-brown font-semibold shadow-soft"
                           : "text-brand-muted hover:bg-brand-cream-dark hover:text-brand-brown"
                       )}
                     >
                       <span>{cat.name}</span>
-                      <span className="text-xs opacity-60">
+                      <span className="text-xs opacity-70">
                         {cat.product_count}
                       </span>
                     </button>
@@ -146,8 +252,8 @@ function ShopContent() {
                 </div>
               </div>
 
-              {/* Price Range */}
-              <div className="mb-6">
+              {/* Price Range Filter */}
+              <div>
                 <p className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-3">
                   Price Range
                 </p>
@@ -165,7 +271,7 @@ function ShopContent() {
                         "w-full text-left px-3 py-2 rounded-xl text-sm transition-colors duration-200",
                         priceRange[0] === option.range[0] &&
                           priceRange[1] === option.range[1]
-                          ? "bg-brand-green-light text-brand-brown font-semibold"
+                          ? "bg-brand-green-light text-brand-brown font-semibold shadow-soft"
                           : "text-brand-muted hover:bg-brand-cream-dark hover:text-brand-brown"
                       )}
                     >
@@ -174,72 +280,98 @@ function ShopContent() {
                   ))}
                   <button
                     onClick={() => setPriceRange([0, 2000])}
-                    className="w-full text-left px-3 py-2 rounded-xl text-sm text-brand-muted hover:bg-brand-cream-dark transition-colors"
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs text-brand-muted hover:bg-brand-cream-dark transition-colors"
                   >
                     Any Price
                   </button>
                 </div>
               </div>
 
-              {/* Tags */}
+              {/* Color Swatch Filter */}
               <div>
                 <p className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-3">
-                  Popular Tags
+                  Felt Colors
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {[
-                    "nursery",
-                    "festive",
-                    "gift",
-                    "custom",
-                    "rainbow",
-                    "keychain",
-                  ].map((tag) => (
-                    <span key={tag} className="chip text-xs capitalize">
-                      #{tag}
-                    </span>
-                  ))}
+                  {availableColors.map((color) => {
+                    const isSelected = selectedColor === color.name;
+                    return (
+                      <button
+                        key={color.name}
+                        onClick={() => setSelectedColor(isSelected ? "" : color.name)}
+                        className={cn(
+                          "w-7 h-7 rounded-full border-2 transition-all flex items-center justify-center relative shadow-soft",
+                          isSelected
+                            ? "border-brand-brown scale-110 shadow-pink"
+                            : "border-brand-beige hover:scale-105"
+                        )}
+                        style={{ backgroundColor: color.hex }}
+                        title={color.name}
+                        aria-label={`Filter color ${color.name}`}
+                      >
+                        {isSelected && (
+                          <Check className="w-3.5 h-3.5 text-brand-brown stroke-[3]" />
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
+              </div>
+
+              {/* In Stock Only */}
+              <div className="pt-2 border-t border-brand-beige/50">
+                <label className="flex items-center gap-2.5 cursor-pointer text-sm font-medium text-brand-brown select-none">
+                  <input
+                    type="checkbox"
+                    checked={inStockOnly}
+                    onChange={(e) => setInStockOnly(e.target.checked)}
+                    className="w-4 h-4 rounded text-brand-pink focus:ring-brand-pink border-brand-beige cursor-pointer"
+                  />
+                  <span>In Stock Only</span>
+                </label>
               </div>
             </div>
           </aside>
 
-          {/* Main Content */}
-          <div className="flex-1">
+          {/* Main Catalog Content */}
+          <div className="flex-1 min-w-0">
             {/* Toolbar */}
-            <div className="flex items-center justify-between mb-6 gap-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between mb-6 gap-4">
               <button
                 id="filter-toggle-btn"
-                className="lg:hidden flex items-center gap-2 btn-secondary text-sm py-2 px-4"
+                className="lg:hidden flex items-center justify-center gap-2 btn-secondary text-sm py-2.5 px-4"
                 onClick={() => setFiltersOpen(!filtersOpen)}
               >
                 <SlidersHorizontal className="w-4 h-4" />
-                Filters
+                Filters {hasActiveFilters && "•"}
               </button>
 
-              <div className="flex items-center gap-3 ml-auto">
-                {/* Sort */}
-                <select
-                  id="sort-select"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="input-brand py-2 text-sm w-auto pr-8 cursor-pointer"
-                >
-                  {sortOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+              <div className="flex items-center gap-3 ml-auto w-full sm:w-auto justify-between sm:justify-end">
+                {/* Sort dropdown */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-brand-muted font-medium hidden md:inline">Sort:</span>
+                  <select
+                    id="sort-select"
+                    value={sortBy}
+                    onChange={(e) => handleSortChange(e.target.value)}
+                    className="input-brand py-2 text-sm w-auto pr-8 cursor-pointer bg-white"
+                  >
+                    {sortOptions.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
                 {/* View toggle */}
-                <div className="hidden md:flex items-center gap-1 bg-white rounded-xl border border-brand-beige p-1">
+                <div className="flex items-center gap-1 bg-white rounded-xl border border-brand-beige p-1">
                   <button
                     onClick={() => setView("grid")}
                     className={cn(
                       "p-1.5 rounded-lg transition-colors",
                       view === "grid"
-                        ? "bg-brand-pink text-brand-brown"
+                        ? "bg-brand-pink text-brand-brown shadow-soft font-semibold"
                         : "text-brand-muted hover:text-brand-brown"
                     )}
                     aria-label="Grid view"
@@ -251,7 +383,7 @@ function ShopContent() {
                     className={cn(
                       "p-1.5 rounded-lg transition-colors",
                       view === "list"
-                        ? "bg-brand-pink text-brand-brown"
+                        ? "bg-brand-pink text-brand-brown shadow-soft font-semibold"
                         : "text-brand-muted hover:text-brand-brown"
                     )}
                     aria-label="List view"
@@ -262,29 +394,117 @@ function ShopContent() {
               </div>
             </div>
 
-            {/* Product Grid */}
-            {filtered.length === 0 ? (
-              <div className="text-center py-20">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/logo.png?v=2"
-                  alt="Pooja Handmade Art"
-                  className="w-16 h-16 rounded-full object-cover mx-auto mb-4"
-                />
+            {/* Active Filter Chips System */}
+            {hasActiveFilters && (
+              <div className="flex flex-wrap items-center gap-2 mb-6 bg-white p-3.5 rounded-2xl border border-brand-beige/60 shadow-soft">
+                <span className="text-xs font-semibold text-brand-muted uppercase tracking-wider mr-1">
+                  Active Filters:
+                </span>
+
+                {selectedCategory !== "all" && (
+                  <span className="chip chip-active text-xs flex items-center gap-1">
+                    Category: {categories.find((c) => c.slug === selectedCategory)?.name}
+                    <button
+                      onClick={() => setSelectedCategory("all")}
+                      className="hover:text-red-600 ml-1"
+                      aria-label="Remove category filter"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                {(priceRange[0] > 0 || priceRange[1] < 2000) && (
+                  <span className="chip chip-active text-xs flex items-center gap-1">
+                    Price: ₹{priceRange[0]} - ₹{priceRange[1]}
+                    <button
+                      onClick={() => setPriceRange([0, 2000])}
+                      className="hover:text-red-600 ml-1"
+                      aria-label="Remove price filter"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                {selectedColor && (
+                  <span className="chip chip-active text-xs flex items-center gap-1">
+                    Color: {selectedColor}
+                    <button
+                      onClick={() => setSelectedColor("")}
+                      className="hover:text-red-600 ml-1"
+                      aria-label="Remove color filter"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                {inStockOnly && (
+                  <span className="chip chip-active text-xs flex items-center gap-1">
+                    In Stock Only
+                    <button
+                      onClick={() => setInStockOnly(false)}
+                      className="hover:text-red-600 ml-1"
+                      aria-label="Remove in-stock filter"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                {searchQuery && (
+                  <span className="chip chip-active text-xs flex items-center gap-1">
+                    Search: &quot;{searchQuery}&quot;
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="hover:text-red-600 ml-1"
+                      aria-label="Remove search query"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+
+                <button
+                  onClick={clearAllFilters}
+                  className="text-xs text-brand-pink-dark font-semibold hover:underline ml-auto"
+                >
+                  Clear All
+                </button>
+              </div>
+            )}
+
+            {/* Product Grid / Skeleton Loaders */}
+            {isLoading ? (
+              <div
+                className={cn(
+                  "grid gap-4 md:gap-6",
+                  view === "grid"
+                    ? "grid-cols-2 md:grid-cols-2 lg:grid-cols-3"
+                    : "grid-cols-1"
+                )}
+              >
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="bg-white rounded-3xl p-12 text-center shadow-soft border border-brand-beige">
+                <div className="w-16 h-16 rounded-full bg-brand-cream flex items-center justify-center mx-auto mb-4 text-3xl">
+                  🌸
+                </div>
                 <h3 className="font-display font-semibold text-brand-brown text-xl mb-2">
-                  No products found
+                  No handcrafted products match your filters
                 </h3>
-                <p className="text-brand-muted">
-                  Try adjusting your filters or search query
+                <p className="text-brand-muted text-sm max-w-md mx-auto mb-6 leading-relaxed">
+                  Try clearing your search terms or expanding your price and color selections to view more items.
                 </p>
                 <button
-                  onClick={() => {
-                    setSelectedCategory("all");
-                    setPriceRange([0, 2000]);
-                  }}
-                  className="btn-primary mt-6 text-sm"
+                  onClick={clearAllFilters}
+                  className="btn-primary text-sm shadow-pink"
                 >
-                  Clear Filters
+                  <RotateCcw className="w-4 h-4" /> Reset Filters
                 </button>
               </div>
             ) : (
@@ -310,11 +530,17 @@ function ShopContent() {
 
 export default function ShopPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-brand-cream flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-brand-pink border-t-transparent rounded-full animate-spin" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-brand-cream container-brand py-12">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      }
+    >
       <ShopContent />
     </Suspense>
   );

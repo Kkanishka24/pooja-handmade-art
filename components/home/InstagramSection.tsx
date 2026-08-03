@@ -1,13 +1,21 @@
 import Image from "next/image";
 import { instagramImages } from "@/lib/data";
 
+const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+  </svg>
+);
+
 export default function InstagramSection() {
   return (
     <section className="section-pad bg-brand-cream-dark">
       <div className="container-brand">
         <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <span className="text-brand-pink text-lg">📷</span>
+            <InstagramIcon className="w-5 h-5 text-brand-pink-dark" />
             <span className="badge-pink text-xs font-semibold uppercase tracking-wider">
               @poojahandmadeart
             </span>
@@ -35,10 +43,8 @@ export default function InstagramSection() {
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-brand-pink/0 group-hover:bg-brand-pink/30 transition-colors duration-300 flex items-center justify-center">
-                <span className="text-white text-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  📷
-                </span>
+              <div className="absolute inset-0 bg-brand-brown/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <InstagramIcon className="w-7 h-7 text-white" />
               </div>
             </a>
           ))}
@@ -49,10 +55,10 @@ export default function InstagramSection() {
             href="https://instagram.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-secondary inline-flex text-sm"
+            className="btn-secondary inline-flex text-sm items-center gap-2 hover:bg-[#E4405F] hover:text-white hover:border-transparent transition-all"
           >
-            <span className="text-base">📷</span>
-            Follow on Instagram
+            <InstagramIcon className="w-4 h-4" />
+            <span>Follow on Instagram</span>
           </a>
         </div>
       </div>

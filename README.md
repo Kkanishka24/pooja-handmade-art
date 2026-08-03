@@ -1,3 +1,39 @@
+# 🌸 Pooja Handmade Art — E-Commerce Assessment Submission
+
+> **Web Development Intern Assessment Submission** for Kanishka Pandey & Team @ Pooja Handmade Art.  
+> 📖 **Full Technical Submission & Change Rationale**: See [SUBMISSION_README.md](./SUBMISSION_README.md) for architectural details, feature breakdowns, and evaluation criteria alignment.
+
+---
+
+## 🚀 Quick Start (Local Setup)
+
+First, install dependencies and run the development server:
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to test all implemented features live.
+
+### Verify Production Build
+```bash
+npm run build
+```
+*(Verified: 0 TypeScript/Next.js errors across 20/20 static and dynamic routes).*
+
+---
+
+## 🛠️ Key Improvements Implemented
+
+1. **Advanced Product Filtering & Sorting (Task 1)**: Category, Price Brackets, Color Swatches, In-Stock Toggle, Active Filter Chips bar with individual dismissal, and 2-way URL search query parameter synchronization.
+2. **Instant Search Modal with Keyboard Navigation (Task 2)**: Global search modal triggered via `/` key, WAI-ARIA `ArrowUp`/`ArrowDown`/`Enter`/`Esc` keyboard focus, search query text highlighting, and `localStorage` recent search history.
+3. **Shimmer Skeleton Loading States (Task 5)**: Custom shimmer placeholders (`ProductCardSkeleton` & `FilterSidebarSkeleton`) preventing Cumulative Layout Shift (CLS) during state transitions.
+4. **Product UI Card Redesign (Task 8)**: Equal-height grid mechanics (`h-full flex flex-col justify-between`), high-contrast badge text (`#3d2b1f`), and quick Add-to-Cart hover overlays.
+5. **Official Brand Vector SVG Icons & Layout Polish (Task 9)**: Replaced emoji placeholders with official vector SVG logos for Instagram, Facebook, and YouTube across Footer, Contact Page, Instagram Section, and About Page; aligned Hero section layout and Contact form cards.
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

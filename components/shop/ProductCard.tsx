@@ -36,10 +36,10 @@ export default function ProductCard({ product, className }: ProductCardProps) {
   };
 
   return (
-    <Link href={`/shop/${product.slug}`} id={`product-${product.id}`}>
-      <div className={cn("product-card", className)}>
+    <Link href={`/shop/${product.slug}`} id={`product-${product.id}`} className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-pink rounded-3xl h-full">
+      <div className={cn("product-card h-full flex flex-col justify-between", className)}>
         {/* Image */}
-        <div className="relative overflow-hidden bg-brand-cream h-56 md:h-64">
+        <div className="relative overflow-hidden bg-brand-cream h-56 md:h-64 shrink-0">
           <Image
             src={product.images[0]}
             alt={product.name}
@@ -94,52 +94,60 @@ export default function ProductCard({ product, className }: ProductCardProps) {
         </div>
 
         {/* Info */}
-        <div className="p-4">
-          <p className="text-brand-muted text-xs mb-1">{product.category.name}</p>
-          <h3 className="font-display font-semibold text-brand-brown text-sm md:text-base leading-tight mb-2 line-clamp-2">
-            {product.name}
-          </h3>
+        <div className="p-4 flex-1 flex flex-col justify-between">
+          <div className="space-y-1">
+            <p className="text-brand-muted text-xs">{product.category.name}</p>
+            <h3 className="font-display font-semibold text-brand-brown text-sm md:text-base leading-tight line-clamp-2 min-h-[2.5rem]">
+              {product.name}
+            </h3>
 
-          {/* Rating */}
-          <div className="flex items-center gap-1 mb-3">
-            <div className="flex items-center gap-0.5">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star
-                  key={i}
-                  className={cn(
-                    "w-3 h-3",
-                    i < Math.floor(product.rating)
-                      ? "fill-brand-yellow text-brand-yellow"
-                      : "text-brand-beige fill-brand-beige"
-                  )}
-                />
-              ))}
-            </div>
-            <span className="text-xs text-brand-muted">
-              ({product.review_count})
-            </span>
-          </div>
-
-          {/* Price */}
-          <div className="flex items-center gap-2">
-            <span className="font-display font-bold text-brand-brown text-base">
-              {formatPrice(product.price)}
-            </span>
-            {product.compare_price && (
-              <span className="text-brand-muted text-sm line-through">
-                {formatPrice(product.compare_price)}
-              </span>
-            )}
-          </div>
-
-          {/* Customizable badge */}
-          {product.customizable && (
-            <div className="mt-2">
-              <span className="text-[10px] font-medium text-brand-terracotta bg-brand-terracotta-light px-2 py-0.5 rounded-full">
-                ✏️ Custom orders available
+            {/* Rating */}
+            <div className="flex items-center gap-1 py-1">
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className={cn(
+                      "w-3 h-3",
+                      i < Math.floor(product.rating)
+                        ? "fill-brand-yellow text-brand-yellow"
+                        : "text-brand-beige fill-brand-beige"
+                    )}
+                  />
+                ))}
+              </div>
+              <span className="text-xs text-brand-muted">
+                ({product.review_count})
               </span>
             </div>
-          )}
+          </div>
+
+          <div className="pt-2 mt-auto">
+            {/* Price */}
+            <div className="flex items-center gap-2">
+              <span className="font-display font-bold text-brand-brown text-base">
+                {formatPrice(product.price)}
+              </span>
+              {product.compare_price && (
+                <span className="text-brand-muted text-sm line-through">
+                  {formatPrice(product.compare_price)}
+                </span>
+              )}
+            </div>
+
+            {/* Feature badge slot (fixed equal height) */}
+            <div className="mt-2.5 pt-1 min-h-[28px] flex items-center">
+              {product.customizable ? (
+                <span className="text-[11px] font-semibold text-brand-brown bg-brand-terracotta-light/80 border border-brand-terracotta/40 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
+                  ✏️ Custom orders available
+                </span>
+              ) : (
+                <span className="text-[11px] font-medium text-brand-muted/70 bg-brand-cream-dark/80 border border-brand-beige/60 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
+                  🌿 100% Handcrafted felt
+                </span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </Link>
