@@ -1,7 +1,7 @@
 "use client";
-
+import { FaInstagram, FaFacebookF } from "react-icons/fa";
 import { useState } from "react";
-import type { Metadata } from "next";
+// import type { Metadata } from "next";
 import {
   Mail,
   Phone,
@@ -156,22 +156,21 @@ export default function ContactPage() {
                 Follow Us
               </h3>
               <div className="flex gap-3">
-                {[
-                  { emoji: "📷", href: "https://instagram.com", label: "Instagram" },
-                  { emoji: "👍", href: "https://facebook.com", label: "Facebook" },
-                ].map(({ emoji, href, label }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={label}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-brand-cream hover:bg-brand-pink-light text-brand-muted hover:text-brand-brown transition-all duration-200 text-sm font-medium"
-                  >
-                    <span>{emoji}</span>
-                    {label}
-                  </a>
-                ))}
+{[
+  { icon: FaInstagram, href: "https://instagram.com", label: "Instagram" },
+  { icon: FaFacebookF, href: "https://facebook.com", label: "Facebook" },
+].map(({ icon: Icon, href, label }) => (
+  <a
+    key={label}
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label={label}
+    className="w-12 h-12 rounded-full bg-brand-pink-light hover:bg-brand-pink flex items-center justify-center transition-all duration-300"
+  >
+    <Icon className="w-6 h-6 text-brand-brown" />
+  </a>
+))}
               </div>
             </div>
 

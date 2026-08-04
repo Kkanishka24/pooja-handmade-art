@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/utils";
 import Image from "next/image";
@@ -42,10 +42,17 @@ export default function CheckoutPage() {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [processing, setProcessing] = useState(false);
 
+  const [mounted, setMounted] = useState(false);
+
+useEffect(() => {
+  setMounted(true);
+}, []);
   const { items, getSubtotal, getShipping, getTotal, clearCart } = useCartStore();
   const subtotal = getSubtotal();
   const shipping = getShipping();
   const total = getTotal();
+
+
 
   const {
     register,
@@ -53,25 +60,88 @@ export default function CheckoutPage() {
     getValues,
     formState: { errors, isValid },
   } = useForm<AddressForm>({ resolver: zodResolver(addressSchema), mode: "onChange" });
-
+if (!mounted) {
+  return null;
+}
   const onAddressSubmit = () => {
     if (isValid) setStep(2);
   };
 
-  const handlePayment = async () => {
+const handlePayment = async () => {
+  try {
     setProcessing(true);
-    await new Promise((r) => setTimeout(r, 2000)); // Simulate Razorpay flow
-    clearCart();
-    setOrderPlaced(true);
+
+    if (paymentMethod === "cod") {
+      clearCart();
+      setOrderPlaced(true);
+      return;
+    }
+
+    const res = await fetch("/api/razorpay", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount: total,
+      }),
+    });
+
+    const order = await res.json();
+
+    console.log("Status:", res.status);
+    console.log("Order:", order);
+
+    if (!res.ok || !order.id) {
+      throw new Error(order.message || "Failed to create Razorpay order");
+    }
+
+    if (!(window as any).Razorpay) {
+      alert("Razorpay SDK not loaded.");
+      return;
+    }
+
+    const options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: order.currency,
+      name: "Pooja Handmade Art",
+      description: "Order Payment",
+      order_id: order.id,
+
+      handler: function (response: any) {
+        console.log("Payment Success:", response);
+        clearCart();
+        setOrderPlaced(true);
+      },
+
+      prefill: {
+        name: getValues("full_name"),
+        email: getValues("email"),
+        contact: getValues("phone"),
+      },
+
+      theme: {
+        color: "#d9776a",
+      },
+    };
+
+    const razorpay = new (window as any).Razorpay(options);
+    razorpay.open();
+  } catch (error) {
+    console.error(error);
+    alert("Payment failed");
+  } finally {
     setProcessing(false);
-  };
+  }
+};
 
   if (orderPlaced) {
     return (
       <div className="min-h-screen bg-brand-cream flex items-center justify-center px-4">
         <div className="text-center max-w-md">
           <div className="w-24 h-24 rounded-full bg-brand-green-light flex items-center justify-center mx-auto mb-6 text-4xl animate-bounce-soft">
-            🎉
+            
           </div>
           <h1 className="font-display font-bold text-3xl text-brand-brown mb-3">
             Order Placed!

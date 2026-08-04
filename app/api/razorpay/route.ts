@@ -1,41 +1,53 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import Razorpay from "razorpay";
 
-export async function POST(request: Request) {
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID!,
+  key_secret: process.env.RAZORPAY_KEY_SECRET!,
+});
+
+export async function POST(req: NextRequest) {
   try {
-    const { amount, currency = "INR", receipt } = await request.json();
+    const body = await req.json();
+    const { amount } = body;
 
     if (!amount || amount <= 0) {
-      return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid amount",
+        },
+        { status: 400 }
+      );
     }
 
-    const keyId = process.env.RAZORPAY_KEY_ID;
-    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    const options = {
+      amount: Math.round(amount * 100), // Amount in paise
+      currency: "INR",
+      receipt: `receipt_${Date.now()}`,
+    };
 
-    if (!keyId || !keySecret || keyId === "rzp_test_placeholder") {
-      // Return mock order for demo/development
-      return NextResponse.json({
-        id: "order_demo_" + Date.now(),
-        amount: amount * 100,
-        currency,
-        receipt: receipt || "receipt_" + Date.now(),
-        status: "created",
-        demo: true,
-      });
-    }
+    const order = await razorpay.orders.create(options);
 
-    // Production: create real Razorpay order
-    const Razorpay = (await import("razorpay")).default;
-    const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
-
-    const order = await razorpay.orders.create({
-      amount: amount * 100, // paise
-      currency,
-      receipt: receipt || "receipt_" + Date.now(),
+    return NextResponse.json({
+      success: true,
+      id: order.id,
+      amount: order.amount,
+      currency: order.currency,
+      receipt: order.receipt,
     });
+  } catch (error: any) {
+  console.error("========== RAZORPAY ERROR ==========");
+  console.error(error);
+  console.error("Message:", error?.message);
+  console.error("Stack:", error?.stack);
 
-    return NextResponse.json(order);
-  } catch (error) {
-    console.error("Razorpay error:", error);
-    return NextResponse.json({ error: "Payment initiation failed" }, { status: 500 });
-  }
+  return NextResponse.json(
+    {
+      success: false,
+      message: error?.message || "Unknown Error",
+    },
+    { status: 500 }
+  );
+}
 }

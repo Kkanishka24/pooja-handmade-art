@@ -1,3 +1,4 @@
+import Script from "next/script";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -33,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-body bg-brand-cream text-brand-brown antialiased">
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" />
         {children}
       </body>
     </html>

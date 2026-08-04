@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useMemo, Suspense } from "react";
+import { useState, useMemo, Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { SlidersHorizontal, Grid3X3, List, X } from "lucide-react";
+
 import ProductCard from "@/components/shop/ProductCard";
+import ProductSkeleton from "@/components/shop/ProductSkeleton";
+
 import { products, categories } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +28,15 @@ function ShopContent() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [searchQuery] = useState(searchParams.get("search") || "");
+  const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setLoading(false);
+  }, 800);
+
+  return () => clearTimeout(timer);
+}, []);
 
   const filtered = useMemo(() => {
     let result = [...products];
@@ -66,8 +78,22 @@ function ShopContent() {
         );
     }
 
+
     return result;
   }, [selectedCategory, sortBy, priceRange, searchQuery]);
+ if (loading) {
+  return (
+    <div className="bg-brand-cream min-h-screen">
+      <div className="container-brand py-8">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <ProductSkeleton key={index} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className="bg-brand-cream min-h-screen">
