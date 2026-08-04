@@ -14,12 +14,10 @@ export default function InstagramSection() {
     <section className="section-pad bg-brand-cream-dark">
       <div className="container-brand">
         <div className="text-center mb-10">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <InstagramIcon className="w-5 h-5 text-brand-pink-dark" />
-            <span className="badge-pink text-xs font-semibold uppercase tracking-wider">
-              @poojahandmadeart
-            </span>
-          </div>
+          <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-2 inline-flex items-center gap-1.5 px-3.5 py-1 shadow-soft">
+            <InstagramIcon className="w-3.5 h-3.5 text-brand-pink-dark" />
+            @poojahandmadeart
+          </span>
           <h2 className="section-title">Follow Our Journey</h2>
           <p className="section-subtitle">
             See our latest creations on Instagram

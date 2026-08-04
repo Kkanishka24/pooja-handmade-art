@@ -9,14 +9,12 @@ export default function NewArrivalsSection() {
   return (
     <section className="section-pad bg-white">
       <div className="container-brand">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-5 h-5 text-brand-pink" />
-              <span className="badge-pink text-xs font-semibold uppercase tracking-wider">
-                Just Arrived
-              </span>
-            </div>
+        <div className="flex flex-col items-center text-center md:items-start md:text-left md:flex-row md:items-end justify-between mb-10 gap-4">
+          <div className="flex flex-col items-center md:items-start">
+            <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-2 inline-flex items-center gap-1.5 px-3 py-1 shadow-soft">
+              <Sparkles className="w-3.5 h-3.5 text-brand-pink-dark" />
+              Just Arrived
+            </span>
             <h2 className="section-title">New Arrivals</h2>
             <p className="section-subtitle">
               Fresh handcrafted creations, made with extra love
@@ -24,7 +22,7 @@ export default function NewArrivalsSection() {
           </div>
           <Link
             href="/shop?sort=newest"
-            className="btn-primary inline-flex text-sm self-start md:self-auto"
+            className="btn-primary inline-flex text-sm self-center md:self-auto"
           >
             See All New <ArrowRight className="w-4 h-4" />
           </Link>

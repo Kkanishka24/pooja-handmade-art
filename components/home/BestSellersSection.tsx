@@ -10,14 +10,12 @@ export default function BestSellersSection() {
     <section className="section-pad bg-gradient-to-b from-brand-cream to-brand-cream-dark">
       <div className="container-brand">
         {/* Heading */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Flame className="w-5 h-5 text-brand-terracotta" />
-              <span className="badge-terracotta text-xs font-semibold uppercase tracking-wider">
-                Most Loved
-              </span>
-            </div>
+        <div className="flex flex-col items-center text-center md:items-start md:text-left md:flex-row md:items-end justify-between mb-10 gap-4">
+          <div className="flex flex-col items-center md:items-start">
+            <span className="badge-terracotta text-xs font-semibold uppercase tracking-wider mb-2 inline-flex items-center gap-1.5 px-3 py-1 shadow-soft">
+              <Flame className="w-3.5 h-3.5 text-brand-terracotta fill-brand-terracotta/20" />
+              Most Loved
+            </span>
             <h2 className="section-title">Best Sellers</h2>
             <p className="section-subtitle">
               Our customers can&apos;t get enough of these
@@ -25,7 +23,7 @@ export default function BestSellersSection() {
           </div>
           <Link
             href="/shop?sort=bestseller"
-            className="btn-secondary inline-flex text-sm self-start md:self-auto"
+            className="btn-secondary inline-flex text-sm self-center md:self-auto"
           >
             View All <ArrowRight className="w-4 h-4" />
           </Link>

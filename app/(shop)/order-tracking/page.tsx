@@ -86,7 +86,8 @@ export default function OrderTrackingPage() {
       <div className="bg-gradient-hero py-16 text-center relative overflow-hidden">
         <div className="absolute top-0 -left-16 w-64 h-64 rounded-full bg-brand-pink-light/40 blur-3xl" />
         <div className="container-brand relative z-10">
-          <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-4 inline-block">
+          <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-4 inline-flex items-center gap-1.5 px-3 py-1 shadow-soft">
+            <Package className="w-3.5 h-3.5 text-brand-pink-dark" />
             Track Your Order
           </span>
           <h1 className="section-title text-4xl mb-4">Where&apos;s My Order?</h1>

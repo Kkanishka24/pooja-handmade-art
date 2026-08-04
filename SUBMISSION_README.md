@@ -1,13 +1,13 @@
 # Internship Assessment Submission — Pooja Handmade Art
 
 **Applicant Submission for**: Web Development Intern Role  
+**Applicant**: Aniket Vishwakarma
 **Reviewer**: Kanishka Pandey & Engineering Team @ Pooja Handmade Art  
 **Repository**: [pooja-handmade-art](https://github.com/Kkanishka24/pooja-handmade-art)  
-**Live Demo**: Runs locally on `http://localhost:3000` (Production build verified clean with 0 TypeScript/Next.js errors across 20/20 static routes).
 
 ---
 
-## 🌟 Executive Summary
+##  Executive Summary
 
 To showcase strong problem-solving, UI/UX judgment, and engineering craftsmanship, this submission delivers a comprehensive **Catalog & E-Commerce Experience Upgrade**. 
 
@@ -72,71 +72,6 @@ Below is a detailed breakdown of **What Was Changed** and **Why It Was Changed**
   - Replaces informal emoji placeholders with professional SVG brand assets.
   - Creates a premium, state-of-the-art visual aesthetic that builds buyer trust immediately upon landing.
 
----
 
-## 🛠️ Tech Stack & Architecture
 
-- **Framework**: Next.js 16.2 (App Router & Turbopack)
-- **Language**: TypeScript (Strict Mode enabled)
-- **Styling**: TailwindCSS + Custom CSS Variables for Brand Tokens
-- **Icons**: Lucide React + Inline Official Brand Vector SVGs
-- **State Management**: Zustand with `localStorage` persistence (`pooja-cart`, `pooja-wishlist`, `pooja-recent-searches`)
-- **Form Validation**: React Hook Form + Zod Schema Validation
 
----
-
-## 🚀 Local Setup & Verification Instructions
-
-### 1. Clone & Install Dependencies
-```bash
-git clone https://github.com/<YOUR_GITHUB_USERNAME>/pooja-handmade-art.git
-cd pooja-handmade-art
-npm install
-```
-
-### 2. Start Development Server
-```bash
-npm run dev
-```
-Open `http://localhost:3000` in your browser.
-
-### 3. Verify Production Build
-```bash
-npm run build
-```
-*Result*: 0 TypeScript errors, 20/20 static/dynamic routes generated cleanly in Next.js Turbopack.
-
----
-
-## 📝 GitHub Pull Request Description (Ready for Email Reply)
-
-When submitting the PR link via email to `Kanishka Pandey`, you can use the summary below as the Pull Request description:
-
-```markdown
-## Summary of Changes — Pooja Handmade Art Internship Assessment
-
-### 1. Product Filtering, Sorting & Active Chips (Task 1)
-- Added multi-criteria filter sidebar (Category, Price Brackets, Felt Color Swatches, In-Stock toggle).
-- Created Active Filter Chips bar with individual dismissal and "Clear All" reset.
-- Implemented 2-way URL search query parameter synchronization.
-
-### 2. Instant Search Modal with Live Suggestions (Task 2)
-- Global search modal accessible via `/` key shortcut or navbar trigger.
-- Full WAI-ARIA keyboard navigation (`ArrowUp`, `ArrowDown`, `Enter`, `Esc`).
-- Live matching text highlighting and persistent search history in `localStorage`.
-
-### 3. Shimmer Skeleton Loading States (Task 5)
-- Created `ProductCardSkeleton` and `FilterSidebarSkeleton` components to prevent layout shift during state changes.
-
-### 4. Equal-Height Product UI Card Redesign (Task 8)
-- Applied strict `h-full flex flex-col justify-between` layout.
-- Improved customizable badge contrast (`#3d2b1f` text) and reserved fixed badge slots.
-
-### 5. Official SVG Social Vector Icons & Layout Polish (Task 9)
-- Replaced emoji placeholders with official vector SVG icons for Instagram, Facebook, and YouTube across Footer, Contact Page, Instagram Section, and About Page.
-- Aligned Hero Section cards and stats strip.
-- Aligned Contact Page form card and optimized textarea spacing.
-
-### Build & Verification
-- `npm run build` executed with 0 errors across all 20 static/dynamic pages.
-```

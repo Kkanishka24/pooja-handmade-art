@@ -30,8 +30,8 @@ export default function NewsletterSection() {
             <Mail className="w-7 h-7 text-brand-pink" />
           </div>
 
-          <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-4 inline-block">
-            <Sparkles className="inline w-3 h-3 mr-1" />
+          <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-4 inline-flex items-center gap-1.5 px-3 py-1 shadow-soft">
+            <Sparkles className="w-3.5 h-3.5 text-brand-pink-dark" />
             Join Our Community
           </span>
           <h2 className="section-title mb-4">

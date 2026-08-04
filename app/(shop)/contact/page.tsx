@@ -75,7 +75,8 @@ export default function ContactPage() {
         <div className="absolute top-0 -left-16 w-64 h-64 rounded-full bg-brand-pink-light/40 blur-3xl" />
         <div className="absolute bottom-0 -right-16 w-80 h-80 rounded-full bg-brand-green-light/30 blur-3xl" />
         <div className="container-brand relative z-10">
-          <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-4 inline-block">
+          <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-4 inline-flex items-center gap-1.5 px-3 py-1 shadow-soft">
+            <Mail className="w-3.5 h-3.5 text-brand-pink-dark" />
             Get in Touch
           </span>
           <h1 className="section-title text-4xl md:text-5xl mb-4">

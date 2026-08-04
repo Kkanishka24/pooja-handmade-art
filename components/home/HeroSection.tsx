@@ -101,8 +101,8 @@ export default function HeroSection() {
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 {/* New badge */}
-                <div className="absolute top-2.5 right-2.5 badge-green text-xs font-semibold py-0.5 px-2.5">
-                  New ✨
+                <div className="absolute top-2.5 right-2.5 badge-green text-xs font-semibold py-0.5 px-2.5 shadow-soft">
+                  <Sparkles className="w-3 h-3 text-brand-green-dark inline mr-0.5" /> New
                 </div>
               </div>
             </div>
@@ -117,36 +117,38 @@ export default function HeroSection() {
               />
             </div>
             <div className="absolute -bottom-3 -left-3 w-10 h-10 md:w-11 md:h-11 bg-brand-pink rounded-full flex items-center justify-center text-lg shadow-card animate-float">
-              ✨
+              <Sparkles className="w-5 h-5 text-brand-brown" />
             </div>
           </div>
         </div>
 
-        {/* Seamless Borderless Stats Strip */}
-        <div className="mt-7 md:mt-9 max-w-4xl mx-auto pt-4 border-t border-brand-pink/25">
-          <div className="grid grid-cols-3 divide-x divide-brand-pink/30 text-center">
-            <div className="px-2 md:px-4">
-              <div className="font-display font-bold text-xl md:text-2xl lg:text-3xl text-brand-brown">
-                500+
+        {/* Combined Unified Glassmorphism Stats Card Bar */}
+        <div className="mt-10 md:mt-12 max-w-3xl mx-auto relative z-10">
+          <div className="bg-white/90 backdrop-blur-md border border-brand-pink/30 rounded-3xl p-5 md:p-6 shadow-soft hover:shadow-card transition-all duration-300">
+            <div className="grid grid-cols-3 divide-x divide-brand-beige text-center">
+              <div className="px-2 sm:px-4">
+                <div className="font-display font-bold text-2xl sm:text-3xl text-brand-brown">
+                  1,200+
+                </div>
+                <div className="text-brand-muted text-xs sm:text-sm font-medium mt-1">
+                  Happy Customers
+                </div>
               </div>
-              <div className="text-brand-muted text-xs md:text-sm font-medium mt-0.5">
-                Happy Customers
+              <div className="px-2 sm:px-4">
+                <div className="font-display font-bold text-2xl sm:text-3xl text-brand-brown flex items-center justify-center gap-1">
+                  4.9 <Star className="w-5 h-5 text-brand-yellow fill-brand-yellow" />
+                </div>
+                <div className="text-brand-muted text-xs sm:text-sm font-medium mt-1">
+                  Average Rating
+                </div>
               </div>
-            </div>
-            <div className="px-2 md:px-4">
-              <div className="font-display font-bold text-xl md:text-2xl lg:text-3xl text-brand-brown">
-                200+
-              </div>
-              <div className="text-brand-muted text-xs md:text-sm font-medium mt-0.5">
-                Unique Products
-              </div>
-            </div>
-            <div className="px-2 md:px-4">
-              <div className="font-display font-bold text-xl md:text-2xl lg:text-3xl text-brand-pink-dark">
-                4.9★
-              </div>
-              <div className="text-brand-muted text-xs md:text-sm font-medium mt-0.5">
-                Average Rating
+              <div className="px-2 sm:px-4">
+                <div className="font-display font-bold text-2xl sm:text-3xl text-brand-brown">
+                  100%
+                </div>
+                <div className="text-brand-muted text-xs sm:text-sm font-medium mt-1">
+                  Handcrafted Felt
+                </div>
               </div>
             </div>
           </div>
