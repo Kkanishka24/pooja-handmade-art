@@ -1,15 +1,61 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/utils";
-import { X, ShoppingBag, Minus, Plus, Trash2, ArrowRight, Truck } from "lucide-react";
+import {
+  X,
+  ShoppingBag,
+  Minus,
+  Plus,
+  Trash2,
+  ArrowRight,
+  Truck,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export default function CartDrawer() {
-  const { items, isOpen, closeCart, removeItem, updateQuantity, getSubtotal, getShipping, getTotal } =
-    useCartStore();
+  const [mounted, setMounted] = useState(false);
+
+  const {
+    items,
+    isOpen,
+    closeCart,
+    removeItem,
+    updateQuantity,
+    getSubtotal,
+    getShipping,
+    getTotal,
+  } = useCartStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Body scroll lock
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "auto";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeCart();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [closeCart]);
+
+  if (!mounted) return null;
 
   const subtotal = getSubtotal();
   const shipping = getShipping();
@@ -27,8 +73,11 @@ export default function CartDrawer() {
 
       {/* Drawer */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cart-title"
         className={cn(
-          "fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out",
+          "fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl flex flex-col transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)]",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
@@ -39,7 +88,10 @@ export default function CartDrawer() {
               <ShoppingBag className="w-4 h-4 text-brand-pink-dark" />
             </div>
             <div>
-              <h2 className="font-display font-semibold text-brand-brown text-lg">
+              <h2
+                id="cart-title"
+                className="font-display font-semibold text-brand-brown text-lg"
+              >
                 Your Cart
               </h2>
               <p className="text-brand-muted text-xs">
@@ -96,14 +148,13 @@ export default function CartDrawer() {
               <p className="text-brand-muted text-sm mb-6">
                 Start shopping to add handmade items to your cart
               </p>
-              <button onClick={closeCart}>
-                <Link
-                  href="/shop"
-                  className="btn-primary text-sm"
-                >
-                  Explore Products
-                </Link>
-              </button>
+              <Link
+                href="/shop"
+                onClick={closeCart}
+                className="btn-primary text-sm"
+              >
+                Explore Products
+              </Link>
             </div>
           ) : (
             items.map((item) => (
@@ -113,15 +164,17 @@ export default function CartDrawer() {
               >
                 <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0">
                   <Image
-                    src={item.product.images[0]}
+                    src={item.product.images?.[0] || "/placeholder.png"}
                     alt={item.product.name}
                     fill
+                    loading="lazy"
+                    sizes="80px"
                     className="object-cover"
                   />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-brand-muted text-xs mb-0.5">
-                    {item.product.category.name}
+                    {item.product.category?.name || "Uncategorized"}
                   </p>
                   <h4 className="font-medium text-brand-brown text-sm leading-tight line-clamp-2 mb-2">
                     {item.product.name}
@@ -130,10 +183,16 @@ export default function CartDrawer() {
                     {/* Quantity */}
                     <div className="flex items-center gap-1 bg-white rounded-full p-0.5 shadow-soft border border-brand-beige">
                       <button
+                        disabled={item.quantity === 1}
                         onClick={() =>
                           updateQuantity(item.product.id, item.quantity - 1)
                         }
-                        className="w-6 h-6 rounded-full hover:bg-brand-cream-dark flex items-center justify-center transition-colors"
+                        className={cn(
+                          "w-6 h-6 rounded-full flex items-center justify-center transition-colors",
+                          item.quantity === 1
+                            ? "opacity-40 cursor-not-allowed"
+                            : "hover:bg-brand-cream-dark"
+                        )}
                         aria-label="Decrease quantity"
                       >
                         <Minus className="w-3 h-3" />
@@ -183,7 +242,7 @@ export default function CartDrawer() {
                     shipping === 0 ? "text-brand-green-dark font-medium" : ""
                   }
                 >
-                  {shipping === 0 ? "Free 🎉" : formatPrice(shipping)}
+                  {shipping === 0 ? "Free " : formatPrice(shipping)}
                 </span>
               </div>
               <div className="flex justify-between font-display font-bold text-brand-brown text-base pt-2 border-t border-brand-beige">

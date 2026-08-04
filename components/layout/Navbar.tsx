@@ -45,15 +45,24 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
 
+  const [mounted, setMounted] = useState(false);
   const cartCount = useCartStore((s) => s.getTotalItems());
   const wishlistCount = useWishlistStore((s) => s.items.length);
   const toggleCart = useCartStore((s) => s.toggleCart);
 
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+useEffect(() => {
+  setMounted(true);
+
+  const handleScroll = () => {
+    setIsScrolled(window.scrollY > 10);
+  };
+
+  window.addEventListener("scroll", handleScroll);
+
+  return () => {
+    window.removeEventListener("scroll", handleScroll);
+  };
+}, []);
 
   return (
     <>
@@ -162,7 +171,7 @@ export default function Navbar() {
                 aria-label="Wishlist"
               >
                 <Heart className="w-5 h-5" />
-                {wishlistCount > 0 && (
+               {mounted && wishlistCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-brand-pink text-brand-brown text-[10px] font-bold rounded-full flex items-center justify-center min-w-[18px] min-h-[18px]">
                     {wishlistCount}
                   </span>
@@ -177,7 +186,7 @@ export default function Navbar() {
                 aria-label="Shopping Cart"
               >
                 <ShoppingCart className="w-5 h-5" />
-                {cartCount > 0 && (
+                {mounted && cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-brand-pink text-brand-brown text-[10px] font-bold rounded-full flex items-center justify-center min-w-[18px] min-h-[18px]">
                     {cartCount}
                   </span>
