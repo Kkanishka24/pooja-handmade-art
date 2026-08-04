@@ -2,7 +2,6 @@
 
 import { useState, use } from "react";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import {
   Star,
@@ -10,8 +9,6 @@ import {
   Heart,
   ShoppingCart,
   Share2,
-  ChevronLeft,
-  ChevronRight,
   Check,
   Truck,
   Shield,
@@ -24,6 +21,7 @@ import { useWishlistStore } from "@/store/wishlistStore";
 import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import ProductCard from "@/components/shop/ProductCard";
+import ProductImageGallery from "@/components/shop/ProductImageGallery";
 
 export default function ProductDetailPage({
   params,
@@ -34,7 +32,6 @@ export default function ProductDetailPage({
   const product = products.find((p) => p.slug === slug);
   if (!product) notFound();
 
-  const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState(
     product.colors?.[0] || ""
@@ -95,77 +92,27 @@ export default function ProductDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Images Column */}
           <div>
-            {/* Main Image */}
-            <div className="relative rounded-3xl md:rounded-4xl overflow-hidden bg-white shadow-card mb-3 aspect-square border border-brand-beige/50">
-              <Image
-                src={product.images[selectedImage]}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-              />
-              {/* Badges */}
-              <div className="absolute top-3.5 left-3.5 flex flex-col gap-1.5 z-10">
-                {product.is_new && (
-                  <span className="badge-green text-xs shadow-soft font-semibold">
-                    <Sparkles className="w-3.5 h-3.5 text-brand-green-dark inline mr-0.5" /> New Arrival
-                  </span>
-                )}
-                {product.is_bestseller && (
-                  <span className="badge-pink text-xs shadow-soft font-semibold">
-                    <Star className="w-3.5 h-3.5 text-brand-brown fill-brand-yellow inline mr-0.5" /> Bestseller
-                  </span>
-                )}
-                {discount > 0 && (
-                  <span className="badge-sale text-xs shadow-soft font-bold">-{discount}% OFF</span>
-                )}
-              </div>
-
-              {/* Navigation arrows */}
-              {product.images.length > 1 && (
+            <ProductImageGallery
+              images={product.images}
+              productName={product.name}
+              badges={
                 <>
-                  <button
-                    onClick={() =>
-                      setSelectedImage((i) =>
-                        (i - 1 + product.images.length) % product.images.length
-                      )
-                    }
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-soft hover:bg-white transition-colors"
-                    aria-label="Previous image"
-                  >
-                    <ChevronLeft className="w-4 h-4 text-brand-brown" />
-                  </button>
-                  <button
-                    onClick={() =>
-                      setSelectedImage((i) => (i + 1) % product.images.length)
-                    }
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-soft hover:bg-white transition-colors"
-                    aria-label="Next image"
-                  >
-                    <ChevronRight className="w-4 h-4 text-brand-brown" />
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Thumbnails */}
-            <div className="flex gap-2.5">
-              {product.images.map((img, i) => (
-                <button
-                  key={i}
-                  onClick={() => setSelectedImage(i)}
-                  className={cn(
-                    "relative w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-2 transition-all duration-200 shrink-0",
-                    i === selectedImage
-                      ? "border-brand-pink shadow-pink scale-105"
-                      : "border-brand-beige/60 hover:border-brand-pink-light"
+                  {product.is_new && (
+                    <span className="badge-green text-xs shadow-soft font-semibold">
+                      <Sparkles className="w-3.5 h-3.5 text-brand-green-dark inline mr-0.5" /> New Arrival
+                    </span>
                   )}
-                  aria-label={`View image ${i + 1}`}
-                >
-                  <Image src={img} alt="" fill className="object-cover" />
-                </button>
-              ))}
-            </div>
+                  {product.is_bestseller && (
+                    <span className="badge-pink text-xs shadow-soft font-semibold">
+                      <Star className="w-3.5 h-3.5 text-brand-brown fill-brand-yellow inline mr-0.5" /> Bestseller
+                    </span>
+                  )}
+                  {discount > 0 && (
+                    <span className="badge-sale text-xs shadow-soft font-bold">-{discount}% OFF</span>
+                  )}
+                </>
+              }
+            />
           </div>
 
           {/* Product Info Column (Arranged Beautifully to Align Perfectly with Left Image + Thumbnails) */}
@@ -268,7 +215,7 @@ export default function ProductDetailPage({
                     className="w-7 h-7 rounded-lg hover:bg-brand-cream-dark flex items-center justify-center transition-colors text-brand-brown font-bold text-sm"
                     aria-label="Decrease"
                   >
-                    −
+                    -
                   </button>
                   <span className="w-6 text-center text-xs font-bold text-brand-brown">
                     {quantity}

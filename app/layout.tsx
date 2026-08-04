@@ -18,6 +18,18 @@ export const metadata: Metadata = {
     "Indian handmade",
     "felt art",
   ],
+
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+
+  manifest: "/site.webmanifest",
+
   openGraph: {
     type: "website",
     locale: "en_IN",
