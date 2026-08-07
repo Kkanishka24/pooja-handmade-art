@@ -1,4 +1,4 @@
-import { Shield, Truck, Palette, Award, Heart, RefreshCw } from "lucide-react";
+import { Shield, Truck, Palette, Award, Heart, RefreshCw, HeartHandshake } from "lucide-react";
 
 const features = [
   {
@@ -57,7 +57,8 @@ export default function WhyChooseUsSection() {
       <div className="container-brand">
         {/* Heading */}
         <div className="text-center mb-14">
-          <span className="badge-green text-xs font-semibold uppercase tracking-wider mb-3 inline-block">
+          <span className="badge-green text-xs font-semibold uppercase tracking-wider mb-3 inline-flex items-center gap-1.5 px-3 py-1 shadow-soft">
+            <HeartHandshake className="w-3.5 h-3.5 text-brand-green-dark" />
             Why We Stand Out
           </span>
           <h2 className="section-title">Why Choose Pooja Handmade Art?</h2>

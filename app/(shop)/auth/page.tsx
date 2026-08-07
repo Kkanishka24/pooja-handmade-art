@@ -92,7 +92,9 @@ export default function AuthPage() {
         <div className="bg-white rounded-4xl shadow-card-hover p-8">
           {success ? (
             <div className="text-center py-8">
-              <div className="text-5xl mb-4">🎉</div>
+              <div className="w-16 h-16 rounded-full bg-brand-green-light flex items-center justify-center mx-auto mb-4 border border-brand-green/30 shadow-soft">
+                <Sparkles className="w-8 h-8 text-brand-green-dark" />
+              </div>
               <h2 className="font-display font-bold text-2xl text-brand-brown mb-2">
                 {mode === "login" ? "Welcome back!" : "Account created!"}
               </h2>

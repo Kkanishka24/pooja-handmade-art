@@ -87,12 +87,18 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     }
   };
 
-  // Focus input when opened
+  // Focus input & lock body scroll when opened
   useEffect(() => {
     if (isOpen) {
+      document.body.style.overflow = "hidden";
       setTimeout(() => inputRef.current?.focus(), 50);
       setSelectedIndex(-1);
+    } else {
+      document.body.style.overflow = "unset";
     }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -133,7 +139,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-card-hover overflow-hidden animate-slide-up border border-brand-beige">
         {/* Search Input Bar */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-brand-beige bg-brand-cream/40">
-          <Search className="w-5 h-5 text-brand-pink shrink-0" />
+          <Search className="w-5 h-5 text-brand-pink-dark shrink-0" />
           <input
             ref={inputRef}
             type="search"
@@ -144,21 +150,21 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
               setSelectedIndex(-1);
             }}
             onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent text-brand-brown placeholder:text-brand-muted focus:outline-none text-base font-medium"
+            className="flex-1 bg-transparent text-brand-brown placeholder:text-brand-brown-light/70 focus:outline-none text-base font-medium"
             id="search-input"
             autoComplete="off"
           />
           {query && (
             <button
               onClick={() => setQuery("")}
-              className="text-xs text-brand-muted hover:text-brand-brown px-2 py-1 rounded-lg hover:bg-brand-cream transition-colors"
+              className="text-xs text-brand-brown-light hover:text-brand-brown px-2 py-1 rounded-lg hover:bg-brand-cream transition-colors"
             >
               Clear
             </button>
           )}
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-brand-cream-dark text-brand-muted transition-colors"
+            className="p-1.5 rounded-full hover:bg-brand-cream-dark text-brand-brown-light hover:text-brand-brown transition-colors"
             aria-label="Close search"
           >
             <X className="w-4 h-4" />
@@ -170,13 +176,13 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
           {/* Empty search results */}
           {query && results.length === 0 && (
             <div className="py-12 text-center px-4">
-              <div className="w-16 h-16 rounded-full bg-brand-cream flex items-center justify-center mx-auto mb-3 text-2xl">
-                🔍
+              <div className="w-16 h-16 rounded-full bg-brand-cream flex items-center justify-center mx-auto mb-3 border border-brand-beige shadow-soft">
+                <Search className="w-7 h-7 text-brand-brown-light" />
               </div>
               <p className="text-brand-brown font-semibold text-base">
                 No items found for &quot;{query}&quot;
               </p>
-              <p className="text-brand-muted text-xs mt-1 max-w-xs mx-auto">
+              <p className="text-brand-brown-light text-xs mt-1 max-w-xs mx-auto">
                 Try searching for nursery, mobile, keychain, Diwali, or cloud decor.
               </p>
             </div>

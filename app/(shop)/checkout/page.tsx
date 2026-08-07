@@ -69,26 +69,25 @@ export default function CheckoutPage() {
   if (orderPlaced) {
     return (
       <div className="min-h-screen bg-brand-cream flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <div className="w-24 h-24 rounded-full bg-brand-green-light flex items-center justify-center mx-auto mb-6 text-4xl animate-bounce-soft">
-            🎉
+        <div className="text-center max-w-md bg-white p-8 md:p-10 rounded-3xl shadow-card border border-brand-beige">
+          <div className="w-20 h-20 rounded-full bg-brand-green-light/80 flex items-center justify-center mx-auto mb-6 border border-brand-green/30 shadow-soft animate-bounce-soft">
+            <CheckCircle className="w-10 h-10 text-brand-green-dark" />
           </div>
-          <h1 className="font-display font-bold text-3xl text-brand-brown mb-3">
-            Order Placed!
+          <h1 className="font-display font-bold text-3xl text-brand-brown mb-2">
+            Order Confirmed!
           </h1>
-          <p className="text-brand-muted mb-2">
-            Thank you for your order! Your handmade items are being prepared
-            with love.
+          <p className="text-brand-brown-light mb-2 leading-relaxed">
+            Thank you for your order! Your handmade items are being handcrafted with love.
           </p>
-          <p className="text-brand-muted text-sm mb-8">
-            You&apos;ll receive a confirmation email shortly at{" "}
-            <strong>{getValues("email")}</strong>
+          <p className="text-brand-brown-light/80 text-xs mb-8 bg-brand-cream-dark p-3 rounded-2xl border border-brand-beige">
+            Order confirmation sent to:{" "}
+            <strong className="text-brand-brown font-semibold">{getValues("email") || "your email"}</strong>
           </p>
-          <div className="flex gap-3 justify-center">
-            <a href="/order-tracking" className="btn-primary">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="/order-tracking" className="btn-primary py-3 px-6 shadow-pink">
               Track Order
             </a>
-            <a href="/shop" className="btn-secondary">
+            <a href="/shop" className="btn-secondary py-3 px-6">
               Continue Shopping
             </a>
           </div>

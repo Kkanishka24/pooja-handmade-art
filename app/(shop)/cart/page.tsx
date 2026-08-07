@@ -1,7 +1,6 @@
 "use client";
 
-import { useCartStore } from "@/store/cartStore";
-import { formatPrice } from "@/lib/utils";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -14,7 +13,8 @@ import {
   Truck,
   Tag,
 } from "lucide-react";
-import { useState } from "react";
+import { useCartStore } from "@/store/cartStore";
+import { formatPrice } from "@/lib/utils";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, getSubtotal, getShipping, getTotal } =
@@ -27,162 +27,185 @@ export default function CartPage() {
   const total = getTotal();
 
   return (
-    <div className="bg-brand-cream min-h-screen">
-      <div className="bg-white border-b border-brand-beige">
-        <div className="container-brand py-8">
-          <h1 className="section-title">Shopping Cart</h1>
-          <p className="section-subtitle text-sm mt-1">
-            {items.length} {items.length === 1 ? "item" : "items"} in your cart
-          </p>
-        </div>
-      </div>
-
-      <div className="container-brand py-10">
+    <div className="bg-brand-cream min-h-screen py-6 md:py-10">
+      <div className="container-brand">
         {items.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-24 h-24 rounded-full bg-brand-cream-dark flex items-center justify-center mx-auto mb-6 text-4xl">
-              🛍️
+          <div className="text-center py-20 bg-white rounded-3xl p-8 shadow-card border border-brand-beige max-w-lg mx-auto">
+            <div className="w-20 h-20 rounded-full bg-brand-pink-light/60 flex items-center justify-center mx-auto mb-5 border border-brand-pink/30 shadow-soft">
+              <ShoppingBag className="w-9 h-9 text-brand-pink-dark" />
             </div>
-            <h2 className="font-display text-2xl font-bold text-brand-brown mb-3">
+            <h2 className="font-display text-2xl font-bold text-brand-brown mb-2">
               Your cart is empty
             </h2>
-            <p className="text-brand-muted mb-8">
-              Looks like you haven&apos;t added any handmade treasures yet!
+            <p className="text-brand-brown-light text-sm max-w-xs mx-auto mb-8 leading-relaxed">
+              Looks like you haven&apos;t added any handcrafted treasures yet!
             </p>
-            <Link href="/shop" className="btn-primary">
+            <Link href="/shop" className="btn-primary shadow-pink">
               <ShoppingBag className="w-5 h-5" />
               Start Shopping
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Cart Items */}
-            <div className="lg:col-span-2 space-y-4">
-              {/* Back link */}
+          /* Single Combined Master Card Container */
+          <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-soft border border-brand-beige/60 w-full max-w-6xl mx-auto">
+            {/* Top Bar Header inside the Card */}
+            <div className="flex items-center justify-between pb-5 border-b border-brand-beige/60 mb-6">
+              <div>
+                <h1 className="font-display font-bold text-brand-brown text-xl sm:text-2xl flex items-center gap-2">
+                  <ShoppingBag className="w-6 h-6 text-brand-pink-dark" />
+                  Your Shopping Cart
+                </h1>
+                <p className="text-brand-muted text-xs mt-0.5">
+                  {items.reduce((t, i) => t + i.quantity, 0)}{" "}
+                  {items.reduce((t, i) => t + i.quantity, 0) === 1
+                    ? "handcrafted item"
+                    : "handcrafted items"}{" "}
+                  selected
+                </p>
+              </div>
               <Link
                 href="/shop"
-                className="inline-flex items-center gap-2 text-brand-muted hover:text-brand-brown text-sm transition-colors mb-4"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-brand-pink-dark hover:underline"
               >
                 <ArrowLeft className="w-4 h-4" /> Continue Shopping
               </Link>
-
-              {items.map((item) => (
-                <div
-                  key={item.product.id}
-                  className="bg-white rounded-3xl p-5 shadow-soft flex gap-5"
-                >
-                  <div className="relative w-24 h-24 rounded-2xl overflow-hidden shrink-0">
-                    <Image
-                      src={item.product.images[0]}
-                      alt={item.product.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <p className="text-brand-muted text-xs mb-0.5">
-                      {item.product.category.name}
-                    </p>
-                    <h3 className="font-display font-semibold text-brand-brown mb-1 line-clamp-1">
-                      {item.product.name}
-                    </h3>
-                    {item.selectedColor && (
-                      <p className="text-brand-muted text-xs mb-2">
-                        Color: {item.selectedColor}
-                      </p>
-                    )}
-
-                    <div className="flex items-center justify-between flex-wrap gap-3">
-                      {/* Qty */}
-                      <div className="flex items-center gap-2 bg-brand-cream rounded-2xl border border-brand-beige px-2 py-1">
-                        <button
-                          onClick={() =>
-                            updateQuantity(item.product.id, item.quantity - 1)
-                          }
-                          className="w-7 h-7 rounded-xl hover:bg-white flex items-center justify-center transition-colors text-lg"
-                          aria-label="Decrease"
-                        >
-                          <Minus className="w-3 h-3" />
-                        </button>
-                        <span className="w-7 text-center font-semibold text-brand-brown text-sm">
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() =>
-                            updateQuantity(item.product.id, item.quantity + 1)
-                          }
-                          className="w-7 h-7 rounded-xl hover:bg-white flex items-center justify-center transition-colors"
-                          aria-label="Increase"
-                        >
-                          <Plus className="w-3 h-3" />
-                        </button>
-                      </div>
-
-                      <div className="flex items-center gap-4">
-                        <span className="font-display font-bold text-brand-brown text-base">
-                          {formatPrice(item.product.price * item.quantity)}
-                        </span>
-                        <button
-                          onClick={() => removeItem(item.product.id)}
-                          className="p-2 rounded-full hover:bg-red-50 text-brand-muted hover:text-red-500 transition-colors"
-                          aria-label="Remove item"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {/* Coupon */}
-              <div className="bg-white rounded-3xl p-5 shadow-soft">
-                <div className="flex items-center gap-2 mb-3">
-                  <Tag className="w-4 h-4 text-brand-pink" />
-                  <p className="font-semibold text-brand-brown text-sm">
-                    Apply Coupon
-                  </p>
-                </div>
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    placeholder="Enter coupon code"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                    className="input-brand text-sm py-2.5 flex-1"
-                  />
-                  <button
-                    onClick={() => couponCode && setCouponApplied(true)}
-                    className="btn-secondary text-sm py-2.5 px-5"
-                  >
-                    Apply
-                  </button>
-                </div>
-                {couponApplied && (
-                  <p className="text-brand-green-dark text-xs mt-2 font-medium">
-                    ✓ Coupon applied successfully!
-                  </p>
-                )}
-              </div>
             </div>
 
-            {/* Order Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-3xl p-6 shadow-soft sticky top-28">
-                <h2 className="font-display font-semibold text-brand-brown text-xl mb-5">
+            {/* Inner Grid Layout within the Single Card */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              {/* Left Column: Items + Coupon */}
+              <div className="lg:col-span-7 space-y-5">
+                {/* Cart Items List */}
+                <div className="divide-y divide-brand-beige/60">
+                  {items.map((item) => (
+                    <div
+                      key={item.product.id}
+                      className="py-4 first:pt-0 last:pb-0 flex gap-4 sm:gap-5 items-center"
+                    >
+                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shrink-0 border border-brand-beige/50 shadow-soft">
+                        <Image
+                          src={item.product.images[0]}
+                          alt={item.product.name}
+                          fill
+                          sizes="(max-width: 640px) 80px, 96px"
+                          className="object-cover"
+                        />
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <span className="badge-pink text-[10px] font-semibold uppercase tracking-wider py-0.5 px-2 inline-block mb-1">
+                          {item.product.category.name}
+                        </span>
+                        <h3 className="font-display font-semibold text-brand-brown text-base sm:text-lg mb-0.5 line-clamp-1">
+                          {item.product.name}
+                        </h3>
+                        {item.selectedColor && (
+                          <p className="text-brand-muted text-xs mb-2">
+                            Color:{" "}
+                            <span className="font-medium text-brand-brown">
+                              {item.selectedColor}
+                            </span>
+                          </p>
+                        )}
+
+                        <div className="flex items-center justify-between flex-wrap gap-3 mt-1.5">
+                          {/* Qty Selector */}
+                          <div className="flex items-center gap-2 bg-brand-cream rounded-2xl border border-brand-beige/80 px-2 py-1 shadow-inner-soft">
+                            <button
+                              onClick={() =>
+                                updateQuantity(item.product.id, item.quantity - 1)
+                              }
+                              className="w-7 h-7 rounded-xl hover:bg-white flex items-center justify-center transition-colors text-brand-brown"
+                              aria-label="Decrease"
+                            >
+                              <Minus className="w-3.5 h-3.5" />
+                            </button>
+                            <span className="w-6 text-center font-semibold text-brand-brown text-sm">
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={() =>
+                                updateQuantity(item.product.id, item.quantity + 1)
+                              }
+                              className="w-7 h-7 rounded-xl hover:bg-white flex items-center justify-center transition-colors text-brand-brown"
+                              aria-label="Increase"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            <span className="font-display font-bold text-brand-brown text-lg">
+                              {formatPrice(item.product.price * item.quantity)}
+                            </span>
+                            <button
+                              onClick={() => removeItem(item.product.id)}
+                              className="p-2 rounded-full hover:bg-red-50 text-brand-muted hover:text-red-500 transition-colors"
+                              aria-label="Remove item"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Integrated Coupon Section */}
+                <div className="pt-5 border-t border-brand-beige/60">
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <Tag className="w-4 h-4 text-brand-pink-dark" />
+                    <p className="font-semibold text-brand-brown text-sm">
+                      Have a Coupon Code?
+                    </p>
+                  </div>
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      placeholder="Enter code (e.g. HANDMADE10)"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      className="input-brand text-sm py-2.5 flex-1"
+                    />
+                    <button
+                      onClick={() => couponCode && setCouponApplied(true)}
+                      className="btn-secondary text-sm py-2.5 px-6 shrink-0"
+                    >
+                      Apply Code
+                    </button>
+                  </div>
+                  {couponApplied && (
+                    <p className="text-brand-green-dark text-xs mt-2 font-medium flex items-center gap-1">
+                      ✓ Coupon applied successfully (10% OFF)!
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column: Order Summary Panel */}
+              <div className="lg:col-span-5 bg-brand-cream/60 p-5 sm:p-6 rounded-3xl border border-brand-beige/70 space-y-4">
+                <h2 className="font-display font-semibold text-brand-brown text-lg border-b border-brand-beige/60 pb-3">
                   Order Summary
                 </h2>
 
-                <div className="space-y-3 text-sm mb-5">
+                <div className="space-y-3 text-sm">
                   <div className="flex justify-between text-brand-muted">
-                    <span>Subtotal ({items.reduce((t, i) => t + i.quantity, 0)} items)</span>
-                    <span>{formatPrice(subtotal)}</span>
+                    <span>
+                      Subtotal ({items.reduce((t, i) => t + i.quantity, 0)} items)
+                    </span>
+                    <span className="font-semibold text-brand-brown">
+                      {formatPrice(subtotal)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-brand-muted">
                     <span>Shipping</span>
-                    <span className={shipping === 0 ? "text-brand-green-dark font-medium" : ""}>
-                      {shipping === 0 ? "Free 🎉" : formatPrice(shipping)}
+                    <span
+                      className={
+                        shipping === 0 ? "text-brand-green-dark font-semibold" : ""
+                      }
+                    >
+                      {shipping === 0 ? "Free Shipping" : formatPrice(shipping)}
                     </span>
                   </div>
                   {couponApplied && (
@@ -191,9 +214,9 @@ export default function CartPage() {
                       <span>-{formatPrice(Math.round(subtotal * 0.1))}</span>
                     </div>
                   )}
-                  <div className="flex justify-between font-display font-bold text-brand-brown text-lg pt-3 border-t border-brand-beige">
+                  <div className="flex justify-between font-display font-bold text-brand-brown text-xl pt-3.5 border-t border-brand-beige/60">
                     <span>Total</span>
-                    <span>
+                    <span className="text-brand-pink-dark">
                       {formatPrice(
                         total - (couponApplied ? Math.round(subtotal * 0.1) : 0)
                       )}
@@ -203,18 +226,23 @@ export default function CartPage() {
 
                 {/* Free shipping notice */}
                 {subtotal < 999 && (
-                  <div className="mb-4 p-3 bg-brand-green-light/50 rounded-2xl">
-                    <div className="flex items-center gap-2 text-sm text-brand-brown mb-2">
-                      <Truck className="w-4 h-4 text-brand-green-dark" />
+                  <div className="p-3 bg-white rounded-2xl border border-brand-green/30 shadow-soft">
+                    <div className="flex items-center gap-2 text-xs text-brand-brown mb-2">
+                      <Truck className="w-3.5 h-3.5 text-brand-green-dark shrink-0" />
                       <span>
                         Add{" "}
-                        <strong>{formatPrice(999 - subtotal)}</strong> for free shipping
+                        <strong className="text-brand-green-dark">
+                          {formatPrice(999 - subtotal)}
+                        </strong>{" "}
+                        more for free shipping!
                       </span>
                     </div>
-                    <div className="h-1.5 bg-white rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-brand-cream rounded-full overflow-hidden border border-brand-green/20">
                       <div
-                        className="h-full bg-brand-green rounded-full"
-                        style={{ width: `${(subtotal / 999) * 100}%` }}
+                        className="h-full bg-brand-green transition-all duration-300"
+                        style={{
+                          width: `${Math.min(100, (subtotal / 999) * 100)}%`,
+                        }}
                       />
                     </div>
                   </div>
@@ -222,15 +250,21 @@ export default function CartPage() {
 
                 <Link
                   href="/checkout"
-                  className="btn-primary w-full justify-center text-base py-4 shadow-pink mb-3"
+                  className="btn-primary w-full py-3.5 text-center justify-center text-base shadow-pink mt-2"
                 >
-                  Proceed to Checkout
-                  <ArrowRight className="w-5 h-5" />
+                  Proceed to Checkout <ArrowRight className="w-4 h-4" />
                 </Link>
 
-                <p className="text-center text-brand-muted text-xs">
-                  🔒 Secure checkout powered by Razorpay
-                </p>
+                <div className="pt-2 border-t border-brand-beige/60 space-y-1.5 text-xs text-brand-muted text-center">
+                  <div className="flex items-center justify-center gap-1.5">
+                    <Truck className="w-3.5 h-3.5 text-brand-pink-dark" />
+                    <span>Free shipping on orders above ₹999</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-1.5">
+                    <span>🔒</span>
+                    <span>100% Secure Checkout powered by Razorpay</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

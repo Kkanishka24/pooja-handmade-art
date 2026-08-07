@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, Quote, ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import { useState } from "react";
 import { testimonials } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,8 @@ export default function ReviewsSection() {
       <div className="container-brand">
         {/* Heading */}
         <div className="text-center mb-14">
-          <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-3 inline-block">
+          <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-3 inline-flex items-center gap-1.5 px-3 py-1 shadow-soft">
+            <Heart className="w-3.5 h-3.5 text-brand-pink-dark fill-brand-pink/20" />
             Testimonials
           </span>
           <h2 className="section-title">What Our Customers Say</h2>

@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { SlidersHorizontal, Grid3X3, List, X, RotateCcw, Check } from "lucide-react";
+import { SlidersHorizontal, Grid3X3, List, X, RotateCcw, Check, Sparkles } from "lucide-react";
 import ProductCard from "@/components/shop/ProductCard";
 import ProductCardSkeleton from "@/components/ui/ProductCardSkeleton";
 import { products, categories } from "@/lib/data";
@@ -53,6 +53,18 @@ function ShopContent() {
   const [view, setView] = useState<"grid" | "list">("grid");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Lock body scroll on mobile when filter sidebar is toggled
+  useEffect(() => {
+    if (filtersOpen && window.innerWidth < 1024) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [filtersOpen]);
+
   // Sync state from URL when navigating client-side (e.g. search from modal)
   useEffect(() => {
     setSelectedCategory(searchParams.get("category") || "all");
@@ -88,6 +100,11 @@ function ShopContent() {
   };
 
   // Simulate short loading skeleton when switching categories or sorting
+  const getCategoryProductCount = (categorySlug: string) => {
+    if (categorySlug === "all") return products.length;
+    return products.filter((p) => p.category.slug === categorySlug).length;
+  };
+
   const handleCategoryChange = (catSlug: string) => {
     setIsLoading(true);
     setSelectedCategory(catSlug);
@@ -210,26 +227,180 @@ function ShopContent() {
 
       <div className="container-brand py-8">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Filters */}
-          <aside
-            className={cn(
-              "lg:w-64 shrink-0",
-              filtersOpen ? "block" : "hidden lg:block"
-            )}
-          >
+          {/* Mobile Filter Sheet Modal */}
+          {filtersOpen && (
+            <div className="fixed inset-0 z-50 flex items-end justify-center lg:hidden">
+              {/* Backdrop */}
+              <div
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+                onClick={() => setFiltersOpen(false)}
+              />
+
+              {/* Mobile Drawer Content Box */}
+              <div className="relative w-full bg-white rounded-t-3xl shadow-2xl flex flex-col h-[82vh] max-h-[620px] z-10 overflow-hidden animate-slide-up">
+                {/* Header (Pinned Top) */}
+                <div className="flex items-center justify-between px-5 py-4 border-b border-brand-beige/60 shrink-0 bg-white">
+                  <h2 className="font-display font-bold text-brand-brown text-lg flex items-center gap-2">
+                    <SlidersHorizontal className="w-4 h-4 text-brand-pink-dark" />
+                    Filter Products
+                  </h2>
+                  <button
+                    className="p-1.5 rounded-full hover:bg-brand-cream text-brand-muted hover:text-brand-brown transition-colors"
+                    onClick={() => setFiltersOpen(false)}
+                    aria-label="Close filters"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Scrollable Filter Options */}
+                <div className="overflow-y-auto flex-1 p-5 space-y-6">
+                  {/* Category Filter */}
+                  <div>
+                    <p className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-3">
+                      Categories
+                    </p>
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => handleCategoryChange("all")}
+                        className={cn(
+                          "w-full text-left px-3 py-2 rounded-xl text-sm transition-colors duration-200 flex items-center justify-between",
+                          selectedCategory === "all"
+                            ? "bg-brand-pink text-brand-brown font-semibold shadow-soft"
+                            : "text-brand-muted hover:bg-brand-cream-dark hover:text-brand-brown"
+                        )}
+                      >
+                        <span>All Products</span>
+                        <span className="text-xs opacity-70">{products.length}</span>
+                      </button>
+                      {categories.map((cat) => (
+                        <button
+                          key={cat.id}
+                          onClick={() => handleCategoryChange(cat.slug)}
+                          className={cn(
+                            "w-full text-left px-3 py-2 rounded-xl text-sm transition-colors duration-200 flex items-center justify-between",
+                            selectedCategory === cat.slug
+                              ? "bg-brand-pink text-brand-brown font-semibold shadow-soft"
+                              : "text-brand-muted hover:bg-brand-cream-dark hover:text-brand-brown"
+                          )}
+                        >
+                          <span>{cat.name}</span>
+                          <span className="text-xs opacity-70">
+                            {getCategoryProductCount(cat.slug)}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Price Range Filter */}
+                  <div>
+                    <p className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-3">
+                      Price Range
+                    </p>
+                    <div className="space-y-1">
+                      {[
+                        { label: "Under ₹500", range: [0, 499] as [number, number] },
+                        { label: "₹500 – ₹999", range: [500, 999] as [number, number] },
+                        { label: "₹1000 – ₹1499", range: [1000, 1499] as [number, number] },
+                        { label: "₹1500+", range: [1500, 9999] as [number, number] },
+                      ].map((option) => (
+                        <button
+                          key={option.label}
+                          onClick={() => setPriceRange(option.range)}
+                          className={cn(
+                            "w-full text-left px-3 py-2 rounded-xl text-sm transition-colors duration-200",
+                            priceRange[0] === option.range[0] &&
+                              priceRange[1] === option.range[1]
+                              ? "bg-brand-green-light text-brand-brown font-semibold shadow-soft"
+                              : "text-brand-muted hover:bg-brand-cream-dark hover:text-brand-brown"
+                          )}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => setPriceRange([0, 2000])}
+                        className="w-full text-left px-3 py-2 rounded-xl text-xs text-brand-muted hover:bg-brand-cream-dark transition-colors"
+                      >
+                        Any Price
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Color Swatch Filter */}
+                  <div>
+                    <p className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-3">
+                      Felt Colors
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {availableColors.map((color) => {
+                        const isSelected = selectedColor === color.name;
+                        return (
+                          <button
+                            key={color.name}
+                            onClick={() => setSelectedColor(isSelected ? "" : color.name)}
+                            className={cn(
+                              "w-7 h-7 rounded-full border-2 transition-all flex items-center justify-center relative shadow-soft",
+                              isSelected
+                                ? "border-brand-brown scale-110 shadow-pink"
+                                : "border-brand-beige hover:scale-105"
+                            )}
+                            style={{ backgroundColor: color.hex }}
+                            title={color.name}
+                            aria-label={`Filter color ${color.name}`}
+                          >
+                            {isSelected && (
+                              <Check className="w-3.5 h-3.5 text-brand-brown stroke-[3]" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* In Stock Only */}
+                  <div className="pt-2 border-t border-brand-beige/50">
+                    <label className="flex items-center gap-2.5 cursor-pointer text-sm font-medium text-brand-brown select-none">
+                      <input
+                        type="checkbox"
+                        checked={inStockOnly}
+                        onChange={(e) => setInStockOnly(e.target.checked)}
+                        className="w-4 h-4 rounded text-brand-pink focus:ring-brand-pink border-brand-beige cursor-pointer"
+                      />
+                      <span>In Stock Only</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Footer Pinned CTA (ALWAYS VISIBLE AT BOTTOM) */}
+                <div className="p-4 border-t border-brand-beige/60 shrink-0 bg-white shadow-lg flex items-center gap-3">
+                  <button
+                    onClick={clearAllFilters}
+                    className="px-3.5 py-3 rounded-2xl border border-brand-beige text-xs font-bold text-brand-brown-light hover:bg-brand-cream transition-colors shrink-0"
+                  >
+                    Reset All
+                  </button>
+                  <button
+                    onClick={() => setFiltersOpen(false)}
+                    className="btn-primary flex-1 justify-center py-3.5 shadow-pink text-sm font-semibold flex items-center gap-2"
+                  >
+                    <Check className="w-4 h-4" />
+                    Apply Filters ({filtered.length})
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Desktop Sidebar Filters */}
+          <aside className="hidden lg:block lg:w-64 shrink-0">
             <div className="bg-white rounded-3xl p-6 shadow-soft sticky top-28 border border-brand-beige/60 space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="font-display font-semibold text-brand-brown text-lg flex items-center gap-2">
                   <SlidersHorizontal className="w-4 h-4 text-brand-pink-dark" />
                   Filters
                 </h2>
-                <button
-                  className="lg:hidden text-brand-muted hover:text-brand-brown"
-                  onClick={() => setFiltersOpen(false)}
-                  aria-label="Close filters"
-                >
-                  <X className="w-4 h-4" />
-                </button>
               </div>
 
               {/* Category Filter */}
@@ -509,13 +680,13 @@ function ShopContent() {
               </div>
             ) : filtered.length === 0 ? (
               <div className="bg-white rounded-3xl p-12 text-center shadow-soft border border-brand-beige">
-                <div className="w-16 h-16 rounded-full bg-brand-cream flex items-center justify-center mx-auto mb-4 text-3xl">
-                  🌸
+                <div className="w-16 h-16 rounded-full bg-brand-cream-dark flex items-center justify-center mx-auto mb-4 border border-brand-beige shadow-soft">
+                  <Sparkles className="w-8 h-8 text-brand-pink-dark" />
                 </div>
                 <h3 className="font-display font-semibold text-brand-brown text-xl mb-2">
                   No handcrafted products match your filters
                 </h3>
-                <p className="text-brand-muted text-sm max-w-md mx-auto mb-6 leading-relaxed">
+                <p className="text-brand-brown-light text-sm max-w-md mx-auto mb-6 leading-relaxed">
                   Try clearing your search terms or expanding your price and color selections to view more items.
                 </p>
                 <button

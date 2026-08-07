@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import {
   Heart,
   Scissors,
@@ -9,6 +10,10 @@ import {
   Star,
   ArrowRight,
   Sparkles,
+  HeartHandshake,
+  Leaf,
+  Mail,
+  Palette,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -58,28 +63,32 @@ const processSteps = [
 
 const values = [
   {
-    emoji: "logo",
+    icon: HeartHandshake,
     title: "Handmade with Intention",
     description:
       "Every product is made one at a time, by hand. No factories, no shortcuts.",
+    color: "bg-brand-pink-light text-brand-pink-dark",
   },
   {
-    emoji: "🌿",
+    icon: Leaf,
     title: "Sustainable Materials",
     description:
       "We source premium, eco-conscious felt fabric and use minimal plastic packaging.",
+    color: "bg-brand-green-light text-brand-green-dark",
   },
   {
-    emoji: "💌",
+    icon: Mail,
     title: "Personal Touch",
     description:
       "Every order ships with a handwritten note — because handmade deserves a personal connection.",
+    color: "bg-brand-terracotta-light text-brand-terracotta",
   },
   {
-    emoji: "✨",
+    icon: Palette,
     title: "Custom Made for You",
     description:
       "We love bringing your ideas to life with personalized and custom orders.",
+    color: "bg-brand-lavender text-purple-600",
   },
 ];
 
@@ -200,8 +209,8 @@ export default function AboutPage() {
       <section className="section-pad bg-brand-cream">
         <div className="container-brand">
           <div className="text-center mb-12">
-            <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-3 inline-block">
-              <Sparkles className="inline w-3 h-3 mr-1" />
+            <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-3 inline-flex items-center gap-1.5 px-3 py-1 shadow-soft">
+              <Sparkles className="w-3.5 h-3.5 text-brand-pink-dark" />
               What We Stand For
             </span>
             <h2 className="section-title">Our Values</h2>
@@ -210,20 +219,16 @@ export default function AboutPage() {
             {values.map((v) => (
               <div
                 key={v.title}
-                className="card-soft text-center hover:shadow-card transition-all duration-300 hover:-translate-y-1"
+                className="card-soft text-center hover:shadow-card transition-all duration-300 hover:-translate-y-1 p-6"
               >
-                {v.emoji === "logo" ? (
-                  <div className="w-14 h-14 rounded-full bg-brand-pink flex items-center justify-center mx-auto mb-4">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src="/logo.png?v=2"
-                      alt={v.title}
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="text-4xl mb-4">{v.emoji}</div>
-                )}
+                <div
+                  className={cn(
+                    "w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-soft",
+                    v.color
+                  )}
+                >
+                  <v.icon className="w-7 h-7" />
+                </div>
                 <h3 className="font-display font-semibold text-brand-brown mb-2 text-lg">
                   {v.title}
                 </h3>

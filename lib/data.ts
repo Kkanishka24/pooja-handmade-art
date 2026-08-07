@@ -8,7 +8,7 @@ export const categories: Category[] = [
     slug: "nursery-decor",
     description: "Adorable handcrafted pieces for your little one's room",
     image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=600&q=80",
-    product_count: 24,
+    product_count: 2,
     color: "bg-brand-pink-light",
   },
   {
@@ -17,7 +17,7 @@ export const categories: Category[] = [
     slug: "festive-decorations",
     description: "Bring joy and color to every celebration",
     image: "https://images.unsplash.com/photo-1576919228236-a097c32a5cd4?w=600&q=80",
-    product_count: 18,
+    product_count: 3,
     color: "bg-brand-green-light",
   },
   {
@@ -26,7 +26,7 @@ export const categories: Category[] = [
     slug: "home-decor",
     description: "Handcrafted art to warm up your living spaces",
     image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600&q=80",
-    product_count: 32,
+    product_count: 2,
     color: "bg-brand-terracotta-light",
   },
   {
@@ -35,7 +35,7 @@ export const categories: Category[] = [
     slug: "gifts-hampers",
     description: "Unique handmade gifts for every occasion",
     image: "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=600&q=80",
-    product_count: 15,
+    product_count: 2,
     color: "bg-brand-lavender",
   },
   {
@@ -44,7 +44,7 @@ export const categories: Category[] = [
     slug: "wall-art",
     description: "Felt wall art to express your unique style",
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
-    product_count: 20,
+    product_count: 2,
     color: "bg-brand-yellow",
   },
   {
@@ -52,8 +52,8 @@ export const categories: Category[] = [
     name: "Keychains & Accessories",
     slug: "keychains-accessories",
     description: "Cute felt accessories for everyday carry",
-    image: "https://images.unsplash.com/photo-1583394293214-4dfabf6a98d6?w=600&q=80",
-    product_count: 28,
+    image: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=600&q=80",
+    product_count: 2,
     color: "bg-brand-cream-dark",
   },
 ];
@@ -100,7 +100,7 @@ export const products: Product[] = [
     price: 649,
     compare_price: 849,
     images: [
-      "https://images.unsplash.com/photo-1490750967868-88df5691cc3d?w=800&q=80",
+      "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800&q=80",
       "https://images.unsplash.com/photo-1519378058457-4c29a0a2efac?w=800&q=80",
     ],
     category: categories[1],
@@ -409,6 +409,35 @@ export const products: Product[] = [
     colors: ["Traditional Red & Green", "Pastel Winter"],
     customizable: false,
     created_at: "2023-10-01",
+  },
+  {
+    id: "13",
+    name: "Felt Celebration Gift Pouch",
+    slug: "felt-celebration-gift-pouch",
+    description:
+      "A charming hand-stitched felt gift pouch filled with cute felt trinkets including a mini plushie and a star keychain. Perfect for small return gifts, birthdays, or festive surprises.",
+    short_description: "Handcrafted felt gift pouch with surprise trinkets",
+    price: 699,
+    compare_price: 899,
+    images: [
+      "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=800&q=80",
+      "https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&q=80",
+    ],
+    category: categories[3],
+    category_id: "4",
+    stock: 25,
+    is_featured: false,
+    is_new: true,
+    is_bestseller: true,
+    tags: ["gift", "pouch", "hamper", "celebration"],
+    rating: 4.9,
+    review_count: 34,
+    sku: "PHA-GIF-002",
+    weight: "180g",
+    materials: ["Premium Felt", "Cotton Cord"],
+    colors: ["Blush Pink", "Sage Green"],
+    customizable: true,
+    created_at: "2024-02-20",
   },
 ];
 
