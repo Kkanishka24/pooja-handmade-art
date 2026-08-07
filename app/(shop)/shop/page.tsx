@@ -81,6 +81,12 @@ function ShopContent() {
     router.replace(newUrl, { scroll: false });
   }, [selectedCategory, sortBy, priceRange, selectedColor, inStockOnly, searchQuery, pathname, router]);
 
+  // Live category product count
+  const getCategoryProductCount = (categorySlug: string) => {
+    if (categorySlug === "all") return products.length;
+    return products.filter((p) => p.category.slug === categorySlug).length;
+  };
+
   // Simulate short loading skeleton when switching categories or sorting
   const handleCategoryChange = (catSlug: string) => {
     setIsLoading(true);
@@ -257,7 +263,7 @@ function ShopContent() {
                     >
                       <span>{cat.name}</span>
                       <span className="text-xs opacity-70">
-                        {cat.product_count}
+                        {getCategoryProductCount(cat.slug)}
                       </span>
                     </button>
                   ))}
