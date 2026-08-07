@@ -13,6 +13,53 @@ interface ProductImageGalleryProps {
   badges?: React.ReactNode;
 }
 
+// Image loader component with skeleton
+function ImageWithLoader({
+  src,
+  alt,
+  fill,
+  className,
+  style,
+  priority,
+  sizes,
+}: {
+  src: string;
+  alt: string;
+  fill?: boolean;
+  className?: string;
+  style?: React.CSSProperties;
+  priority?: boolean;
+  sizes?: string;
+}) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  return (
+    <div className="relative w-full h-full">
+      {/* Skeleton loader */}
+      {isLoading && !hasError && (
+        <div className="absolute inset-0 bg-brand-cream animate-pulse-soft z-10 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-brand-beige/50" />
+        </div>
+      )}
+      <Image
+        src={src}
+        alt={alt}
+        fill={fill}
+        className={cn(className, isLoading && "opacity-0", !isLoading && "opacity-100")}
+        style={style}
+        priority={priority}
+        sizes={sizes}
+        onLoad={() => setIsLoading(false)}
+        onError={() => {
+          setIsLoading(false);
+          setHasError(true);
+        }}
+      />
+    </div>
+  );
+}
+
 export default function ProductImageGallery({
   images,
   productName,
@@ -112,8 +159,15 @@ export default function ProductImageGallery({
         <div className="overflow-hidden h-full" ref={mainRef}>
           <div className="flex h-full">
             {images.map((img, i) => (
-              <div key={i} className="relative shrink-0 grow-0 basis-full h-full">
-                <Image
+              <motion.div
+                key={i}
+                className="relative shrink-0 grow-0 basis-full h-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+              >
+                <ImageWithLoader
                   src={img}
                   alt={`${productName} ${i + 1}`}
                   fill
@@ -130,7 +184,7 @@ export default function ProductImageGallery({
                   }
                   priority={i === 0}
                 />
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -180,14 +234,23 @@ export default function ProductImageGallery({
               key={i}
               onClick={() => scrollTo(i)}
               className={cn(
-                "relative w-20 h-20 shrink-0 rounded-2xl overflow-hidden border-2 transition-all duration-200",
+                "relative w-20 h-20 shrink-0 rounded-2xl overflow-hidden border-2 transition-all duration-300",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-pink-dark focus-visible:ring-offset-2",
+                "min-w-[44px] min-h-[44px]",
                 i === selectedIndex
-                  ? "border-brand-pink shadow-pink"
-                  : "border-transparent hover:border-brand-pink-light"
+                  ? "border-brand-pink shadow-pink scale-105 ring-2 ring-brand-pink/30"
+                  : "border-transparent hover:border-brand-pink-light hover:scale-102"
               )}
-              aria-label={`View image ${i + 1}`}
+              aria-label={`View image ${i + 1} of ${images.length}`}
+              aria-pressed={i === selectedIndex}
+              role="tab"
             >
-              <Image src={img} alt="" fill className="object-cover" />
+              <ImageWithLoader
+                src={img}
+                alt={`${productName} thumbnail ${i + 1}`}
+                fill
+                className="object-cover"
+              />
             </button>
           ))}
         </div>
@@ -207,8 +270,8 @@ export default function ProductImageGallery({
           >
             <button
               onClick={() => setLightboxOpen(false)}
-              className="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors z-10"
-              aria-label="Close"
+              className="absolute top-5 right-5 w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              aria-label="Close fullscreen gallery"
             >
               <X className="w-5 h-5" />
             </button>

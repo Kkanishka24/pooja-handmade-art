@@ -206,7 +206,21 @@ h1, h2, h3, h4, h5, h6 {
     height: 100%; display: flex; flex-direction: column; justify-content: space-between;
     border: 1px solid rgba(237, 224, 208, 0.6);
   }
-  .product-card:hover { box-shadow: var(--shadow-card-hover); transform: translateY(-4px); border-color: rgba(244, 167, 185, 0.4); }
+  .product-card:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-4px);
+    border-color: rgba(244, 167, 185, 0.4);
+  }
+
+  /* Hover scale utility for smooth animations */
+  .hover\:scale-102:hover {
+    transform: scale(1.02);
+  }
+
+  /* Smooth transition for badges */
+  .badge-green, .badge-pink, .badge-sale, .badge-terracotta {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
   /* Layout helpers */
   .section-pad { padding: 4rem 0; }
