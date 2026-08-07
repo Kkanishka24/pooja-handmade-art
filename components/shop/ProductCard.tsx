@@ -36,31 +36,35 @@ export default function ProductCard({ product, className }: ProductCardProps) {
   };
 
   return (
-    <Link href={`/shop/${product.slug}`} id={`product-${product.id}`} className="group block focus:outline-none rounded-3xl h-full">
-      <div className={cn("product-card h-full flex flex-col justify-between transition-all duration-300", className)}>
+    <Link 
+      href={`/shop/${product.slug}`} 
+      id={`product-${product.id}`} 
+      className="group block focus:outline-none rounded-3xl h-full focus-visible:ring-2 focus-visible:ring-brand-pink-dark focus-visible:ring-offset-2"
+    >
+      <div className={cn("product-card h-full flex flex-col justify-between transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-card-hover", className)}>
         {/* Image */}
         <div className="relative overflow-hidden bg-brand-cream h-56 md:h-64 shrink-0 rounded-t-3xl">
           <Image
             src={product.images[0]}
             alt={product.name}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
           />
 
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
             {product.is_new && (
-              <span className="badge-green text-xs font-semibold shadow-soft">
+              <span className="badge-green text-xs font-semibold shadow-soft transition-all duration-300 hover:scale-105 hover:shadow-card">
                 <Sparkles className="w-3 h-3 text-brand-green-dark inline" /> New Arrival
               </span>
             )}
             {product.is_bestseller && (
-              <span className="badge-pink text-xs font-semibold shadow-soft">
+              <span className="badge-pink text-xs font-semibold shadow-soft transition-all duration-300 hover:scale-105 hover:shadow-card">
                 <Star className="w-3 h-3 text-brand-brown fill-brand-yellow inline" /> Bestseller
               </span>
             )}
             {discount > 0 && (
-              <span className="badge-sale text-xs font-bold shadow-soft">
+              <span className="badge-sale text-xs font-bold shadow-soft transition-all duration-300 hover:scale-105 hover:shadow-card">
                 <Tag className="w-3 h-3 inline" /> -{discount}%
               </span>
             )}
@@ -72,7 +76,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
               onClick={handleWishlist}
               aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
               className={cn(
-                "wishlist-btn transition-transform active:scale-95",
+                "wishlist-btn transition-all duration-200 active:scale-90 min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-pink-dark",
                 wishlisted && "bg-brand-pink-light border-brand-pink"
               )}
             >
@@ -88,10 +92,10 @@ export default function ProductCard({ product, className }: ProductCardProps) {
           </div>
 
           {/* Quick Add to Cart */}
-          <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-10 bg-gradient-to-t from-black/20 via-transparent to-transparent">
+          <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out z-10 bg-gradient-to-t from-black/20 via-transparent to-transparent">
             <button
               onClick={handleAddToCart}
-              className="w-full btn-primary text-sm py-2.5 shadow-pink flex items-center justify-center gap-2"
+              className="w-full btn-primary text-sm py-3 shadow-pink flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 min-h-[44px]"
             >
               <ShoppingCart className="w-4 h-4" />
               Add to Cart
