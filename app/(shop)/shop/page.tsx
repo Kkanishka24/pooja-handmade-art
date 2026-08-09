@@ -100,10 +100,7 @@ function ShopContent() {
   };
 
   // Simulate short loading skeleton when switching categories or sorting
-  const getCategoryProductCount = (categorySlug: string) => {
-    if (categorySlug === "all") return products.length;
-    return products.filter((p) => p.category.slug === categorySlug).length;
-  };
+
 
   const handleCategoryChange = (catSlug: string) => {
     setIsLoading(true);

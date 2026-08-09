@@ -46,9 +46,11 @@ export default function Navbar() {
   const [categoryOpen, setCategoryOpen] = useState(false);
 
   const cartCount = useCartStore((s) => s.getTotalItems());
+  const cartHydrated = useCartStore((s) => s.hasHydrated);
   const wishlistCount = useWishlistStore((s) => s.items.length);
+  const wishlistHydrated = useWishlistStore((s) => s.hasHydrated);
   const toggleCart = useCartStore((s) => s.toggleCart);
-
+  
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
@@ -162,11 +164,11 @@ export default function Navbar() {
                 aria-label="Wishlist"
               >
                 <Heart className="w-5 h-5" />
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-brand-pink text-brand-brown text-[10px] font-bold rounded-full flex items-center justify-center min-w-[18px] min-h-[18px]">
-                    {wishlistCount}
-                  </span>
-                )}
+               {wishlistHydrated  && wishlistCount > 0 && (
+  <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-brand-pink text-brand-brown text-[10px] font-bold rounded-full flex items-center justify-center">
+    {wishlistCount}
+  </span>
+)}
               </Link>
 
               {/* Cart */}
@@ -177,11 +179,11 @@ export default function Navbar() {
                 aria-label="Shopping Cart"
               >
                 <ShoppingCart className="w-5 h-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-brand-pink text-brand-brown text-[10px] font-bold rounded-full flex items-center justify-center min-w-[18px] min-h-[18px]">
-                    {cartCount}
-                  </span>
-                )}
+                {cartHydrated && cartCount > 0 && (
+  <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-brand-pink text-brand-brown text-[10px] font-bold rounded-full flex items-center justify-center">
+    {cartCount}
+  </span>
+)}
               </button>
 
               {/* Auth */}

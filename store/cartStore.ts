@@ -7,6 +7,8 @@ import { CartItem, Product } from "@/types";
 interface CartStore {
   items: CartItem[];
   isOpen: boolean;
+  hasHydrated: boolean;
+  setHasHydrated: (value: boolean) => void;
   addItem: (product: Product, quantity?: number, color?: string) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
@@ -25,6 +27,8 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       isOpen: false,
+      hasHydrated: false,
+      setHasHydrated: (value) => set({ hasHydrated: value }),
 
       addItem: (product, quantity = 1, color) => {
         set((state) => {
@@ -94,7 +98,11 @@ export const useCartStore = create<CartStore>()(
       },
     }),
     {
-      name: "pooja-cart",
-    }
+  name: "pooja-cart",
+
+  onRehydrateStorage: () => (state) => {
+    state?.setHasHydrated(true);
+  },
+}
   )
 );
