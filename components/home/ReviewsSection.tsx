@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { Star, Quote, ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import { useState } from "react";
 import { testimonials } from "@/lib/data";
@@ -40,14 +39,14 @@ export default function ReviewsSection() {
               4.9 / 5
             </span>
             <span className="text-brand-muted text-xs">
-              (500+ verified reviews)
+              (700+ verified reviews)
             </span>
           </div>
         </div>
 
-        {/* Desktop: 3 column grid */}
-        <div className="hidden md:grid grid-cols-3 gap-6">
-          {testimonials.slice(0, 3).map((review) => (
+        {/* Desktop: 3 column grid for all reviews */}
+        <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+          {testimonials.map((review) => (
             <ReviewCard key={review.id} review={review} />
           ))}
         </div>
@@ -64,7 +63,7 @@ export default function ReviewsSection() {
               >
                 <ChevronLeft className="w-4 h-4 text-brand-brown" />
               </button>
-              <div className="flex gap-1.5">
+              <div className="flex gap-1.5 flex-wrap justify-center">
                 {testimonials.map((_, i) => (
                   <button
                     key={i}
@@ -89,13 +88,6 @@ export default function ReviewsSection() {
             </div>
           </div>
         </div>
-
-        {/* Second row on desktop */}
-        <div className="hidden md:grid grid-cols-3 gap-6 mt-6">
-          {testimonials.slice(3, 6).map((review) => (
-            <ReviewCard key={review.id} review={review} />
-          ))}
-        </div>
       </div>
     </section>
   );
@@ -103,7 +95,7 @@ export default function ReviewsSection() {
 
 function ReviewCard({ review }: { review: (typeof testimonials)[0] }) {
   return (
-    <div className="flex flex-col justify-between p-5 rounded-3xl bg-white border border-brand-brown/8 shadow-soft hover:shadow-card hover:border-brand-pink/30 transition-all duration-300">
+    <div className="flex flex-col justify-between p-5 rounded-3xl bg-white border border-brand-brown/8 shadow-soft hover:shadow-card hover:border-brand-pink/30 transition-all duration-300 h-full">
       <div>
         <div className="flex items-center justify-between mb-3">
           <Quote className="w-6 h-6 text-brand-pink-dark/40" />
@@ -121,28 +113,18 @@ function ReviewCard({ review }: { review: (typeof testimonials)[0] }) {
             ))}
           </div>
         </div>
-        <p className="text-brand-brown/90 text-xs sm:text-sm leading-relaxed mb-4 line-clamp-4">
+        <p className="text-brand-brown/90 text-xs sm:text-sm leading-relaxed mb-4">
           &quot;{review.comment}&quot;
         </p>
       </div>
 
-      <div className="pt-3 border-t border-brand-brown/5 flex items-center gap-3">
-        {review.user_avatar && (
-          <div className="relative w-9 h-9 rounded-full overflow-hidden border border-brand-pink/30 shrink-0">
-            <Image
-              src={review.user_avatar}
-              alt={review.user_name}
-              fill
-              className="object-cover"
-            />
-          </div>
-        )}
-        <div className="flex-1 min-w-0">
-          <p className="font-display font-semibold text-brand-brown text-xs sm:text-sm truncate">
+      <div className="pt-3 border-t border-brand-brown/5 flex items-center justify-between gap-3 mt-auto">
+        <div>
+          <p className="font-display font-semibold text-brand-brown text-xs sm:text-sm">
             {review.user_name}
           </p>
           {review.verified && (
-            <p className="text-[10px] text-emerald-700 font-medium flex items-center gap-0.5">
+            <p className="text-[10px] text-emerald-700 font-medium flex items-center gap-0.5 mt-0.5">
               ✓ Verified Purchase
             </p>
           )}
