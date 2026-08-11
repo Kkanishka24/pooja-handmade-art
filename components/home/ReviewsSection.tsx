@@ -14,28 +14,33 @@ export default function ReviewsSection() {
   const next = () => setCurrent((c) => (c + 1) % total);
 
   return (
-    <section className="section-pad bg-white overflow-hidden">
+    <section className="py-12 md:py-16 bg-gradient-to-b from-brand-cream/40 via-brand-cream/80 to-white overflow-hidden">
       <div className="container-brand">
         {/* Heading */}
-        <div className="text-center mb-14">
-          <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-3 inline-flex items-center gap-1.5 px-3 py-1 shadow-soft">
+        <div className="text-center mb-10 md:mb-14">
+          <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-2.5 inline-flex items-center gap-1.5 px-3.5 py-1 shadow-soft">
             <Heart className="w-3.5 h-3.5 text-brand-pink-dark fill-brand-pink/20" />
-            Testimonials
+            Customer Reviews
           </span>
-          <h2 className="section-title">What Our Customers Say</h2>
-          <p className="section-subtitle">
+          <h2 className="section-title text-2xl sm:text-3xl md:text-4xl">What Our Customers Say</h2>
+          <p className="section-subtitle text-xs sm:text-sm md:text-base mt-1">
             Real reviews from happy customers who love our handmade crafts
           </p>
-          {/* Star row */}
-          <div className="flex items-center justify-center gap-1 mt-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star
-                key={i}
-                className="w-5 h-5 fill-brand-yellow text-brand-yellow"
-              />
-            ))}
-            <span className="ml-2 text-brand-muted text-sm font-medium">
-              4.9/5 from 500+ reviews
+          {/* Rating Summary */}
+          <div className="inline-flex items-center gap-2 mt-4 px-4 py-1.5 rounded-full bg-white/90 border border-brand-brown/8 shadow-soft">
+            <div className="flex items-center gap-0.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  className="w-4 h-4 fill-brand-yellow text-brand-yellow"
+                />
+              ))}
+            </div>
+            <span className="text-brand-brown font-semibold text-xs sm:text-sm">
+              4.9 / 5
+            </span>
+            <span className="text-brand-muted text-xs">
+              (500+ verified reviews)
             </span>
           </div>
         </div>
@@ -51,10 +56,10 @@ export default function ReviewsSection() {
         <div className="md:hidden">
           <div className="relative">
             <ReviewCard review={testimonials[current]} />
-            <div className="flex items-center justify-center gap-4 mt-6">
+            <div className="flex items-center justify-center gap-4 mt-5">
               <button
                 onClick={prev}
-                className="p-2 rounded-full border-2 border-brand-beige hover:border-brand-pink hover:bg-brand-pink-light transition-all duration-200"
+                className="p-2.5 rounded-full bg-white border border-brand-brown/10 shadow-soft hover:bg-brand-pink-light transition-all"
                 aria-label="Previous review"
               >
                 <ChevronLeft className="w-4 h-4 text-brand-brown" />
@@ -65,10 +70,10 @@ export default function ReviewsSection() {
                     key={i}
                     onClick={() => setCurrent(i)}
                     className={cn(
-                      "rounded-full transition-all duration-200",
+                      "rounded-full transition-all duration-300",
                       i === current
-                        ? "w-6 h-2 bg-brand-pink"
-                        : "w-2 h-2 bg-brand-beige"
+                        ? "w-6 h-2 bg-brand-pink-dark"
+                        : "w-2 h-2 bg-brand-brown/20"
                     )}
                     aria-label={`Go to review ${i + 1}`}
                   />
@@ -76,7 +81,7 @@ export default function ReviewsSection() {
               </div>
               <button
                 onClick={next}
-                className="p-2 rounded-full border-2 border-brand-beige hover:border-brand-pink hover:bg-brand-pink-light transition-all duration-200"
+                className="p-2.5 rounded-full bg-white border border-brand-brown/10 shadow-soft hover:bg-brand-pink-light transition-all"
                 aria-label="Next review"
               >
                 <ChevronRight className="w-4 h-4 text-brand-brown" />
@@ -98,27 +103,32 @@ export default function ReviewsSection() {
 
 function ReviewCard({ review }: { review: (typeof testimonials)[0] }) {
   return (
-    <div className="card-soft border border-brand-pink/10 hover:border-brand-pink/30 hover:shadow-card transition-all duration-300">
-      <Quote className="w-6 h-6 text-brand-pink mb-3 opacity-60" />
-      <p className="text-brand-muted text-sm leading-relaxed mb-4 line-clamp-4">
-        {review.comment}
-      </p>
-      <div className="flex items-center gap-1 mb-4">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star
-            key={i}
-            className={cn(
-              "w-3.5 h-3.5",
-              i < review.rating
-                ? "fill-brand-yellow text-brand-yellow"
-                : "text-brand-beige fill-brand-beige"
-            )}
-          />
-        ))}
+    <div className="flex flex-col justify-between p-5 rounded-3xl bg-white border border-brand-brown/8 shadow-soft hover:shadow-card hover:border-brand-pink/30 transition-all duration-300">
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <Quote className="w-6 h-6 text-brand-pink-dark/40" />
+          <div className="flex items-center gap-0.5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star
+                key={i}
+                className={cn(
+                  "w-3.5 h-3.5",
+                  i < review.rating
+                    ? "fill-brand-yellow text-brand-yellow"
+                    : "text-brand-beige fill-brand-beige"
+                )}
+              />
+            ))}
+          </div>
+        </div>
+        <p className="text-brand-brown/90 text-xs sm:text-sm leading-relaxed mb-4 line-clamp-4">
+          &quot;{review.comment}&quot;
+        </p>
       </div>
-      <div className="flex items-center gap-3">
+
+      <div className="pt-3 border-t border-brand-brown/5 flex items-center gap-3">
         {review.user_avatar && (
-          <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-brand-pink-light">
+          <div className="relative w-9 h-9 rounded-full overflow-hidden border border-brand-pink/30 shrink-0">
             <Image
               src={review.user_avatar}
               alt={review.user_name}
@@ -127,12 +137,12 @@ function ReviewCard({ review }: { review: (typeof testimonials)[0] }) {
             />
           </div>
         )}
-        <div>
-          <p className="font-semibold text-brand-brown text-sm">
+        <div className="flex-1 min-w-0">
+          <p className="font-display font-semibold text-brand-brown text-xs sm:text-sm truncate">
             {review.user_name}
           </p>
           {review.verified && (
-            <p className="text-[10px] text-brand-green-dark font-medium">
+            <p className="text-[10px] text-emerald-700 font-medium flex items-center gap-0.5">
               ✓ Verified Purchase
             </p>
           )}

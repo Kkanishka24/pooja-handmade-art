@@ -42,6 +42,7 @@ export interface CartItem {
   product: Product;
   quantity: number;
   selectedColor?: string;
+  customName?: string;
 }
 
 // ─── Order ────────────────────────────────────────────────────────────────────

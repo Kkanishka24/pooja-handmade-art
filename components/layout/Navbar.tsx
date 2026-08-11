@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   ShoppingCart,
   Heart,
@@ -12,12 +12,16 @@ import {
   User,
   ChevronDown,
   Sparkles,
+  LogOut,
+  Package,
 } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { cn } from "@/lib/utils";
 import CartDrawer from "@/components/cart/CartDrawer";
 import SearchModal from "@/components/shop/SearchModal";
+import { supabase } from "@/lib/supabase";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -26,12 +30,12 @@ const navLinks = [
     label: "Categories",
     href: "#",
     children: [
-      { label: "Nursery Décor", href: "/shop?category=nursery-decor" },
-      { label: "Festive Decorations", href: "/shop?category=festive-decorations" },
-      { label: "Home Décor", href: "/shop?category=home-decor" },
-      { label: "Gifts & Hampers", href: "/shop?category=gifts-hampers" },
-      { label: "Wall Art", href: "/shop?category=wall-art" },
-      { label: "Keychains & Accessories", href: "/shop?category=keychains-accessories" },
+      { label: "✨ Personalised Name", href: "/shop?category=personalised-name" },
+      { label: "Cute Plush Ornaments without Bell", href: "/shop?category=cute-plush-ornaments-without-bell" },
+      { label: "Cute Plush Ornaments with Bell", href: "/shop?category=cute-plush-ornaments-with-bell" },
+      { label: "Door and Wall Decor", href: "/shop?category=door-and-wall-decor" },
+      { label: "Festive Special Decor", href: "/shop?category=festive-special-decor" },
+      { label: "Garden Decor", href: "/shop?category=garden-decor" },
     ],
   },
   { label: "About", href: "/about" },
@@ -40,28 +44,61 @@ const navLinks = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   const cartCount = useCartStore((s) => s.getTotalItems());
   const wishlistCount = useWishlistStore((s) => s.items.length);
   const toggleCart = useCartStore((s) => s.toggleCart);
 
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  /* AUTHENTICATION TEMPORARILY DISABLED (Uncomment when needed):
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+  */
+
+  // Close user menu on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setUserMenuOpen(false);
+    router.push("/");
+  };
+
   return (
     <>
       {/* Announcement Banner */}
-      <div className="bg-brand-pink text-brand-brown text-center py-2 px-4 text-sm font-medium">
-        <Sparkles className="inline w-3.5 h-3.5 mr-1" />
-        Free shipping on orders above ₹999 &nbsp;|&nbsp; Custom orders welcome!
-        <Sparkles className="inline w-3.5 h-3.5 ml-1" />
+      <div className="bg-brand-pink text-brand-brown text-center py-2 px-4 text-xs sm:text-sm font-semibold tracking-wide flex items-center justify-center gap-1.5 flex-wrap">
+
+        <span>Free Shipping on Orders Above ₹999 &nbsp;|&nbsp; Personalised Name Designs &nbsp;|&nbsp; Washable &amp; Durable</span>
+
       </div>
 
       <header
@@ -162,7 +199,7 @@ export default function Navbar() {
                 aria-label="Wishlist"
               >
                 <Heart className="w-5 h-5" />
-                {wishlistCount > 0 && (
+                {mounted && wishlistCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-brand-pink text-brand-brown text-[10px] font-bold rounded-full flex items-center justify-center min-w-[18px] min-h-[18px]">
                     {wishlistCount}
                   </span>
@@ -177,22 +214,55 @@ export default function Navbar() {
                 aria-label="Shopping Cart"
               >
                 <ShoppingCart className="w-5 h-5" />
-                {cartCount > 0 && (
+                {mounted && cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-brand-pink text-brand-brown text-[10px] font-bold rounded-full flex items-center justify-center min-w-[18px] min-h-[18px]">
                     {cartCount}
                   </span>
                 )}
               </button>
 
-              {/* Auth */}
-              <Link
-                href="/auth"
-                id="auth-btn"
-                className="hidden md:flex p-2 rounded-full text-brand-muted hover:text-brand-brown hover:bg-brand-cream-dark transition-all duration-200"
-                aria-label="Account"
-              >
-                <User className="w-5 h-5" />
-              </Link>
+              {/* AUTHENTICATION TEMPORARILY DISABLED (Uncomment when needed):
+              {user ? (
+                <div ref={userMenuRef} className="relative hidden md:block">
+                  <button
+                    id="user-menu-btn"
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="w-9 h-9 rounded-full bg-brand-pink flex items-center justify-center text-brand-brown font-bold text-sm hover:bg-brand-pink-dark transition-all duration-200"
+                    aria-label="User menu"
+                  >
+                    {user.email?.charAt(0).toUpperCase() || "U"}
+                  </button>
+                  {userMenuOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-card-hover border border-brand-beige py-2 z-50 animate-fade-in">
+                      <p className="px-4 py-2 text-xs text-brand-muted truncate border-b border-brand-beige mb-1">{user.email}</p>
+                      <Link
+                        href="/order-tracking"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-brand-muted hover:text-brand-brown hover:bg-brand-cream-dark transition-colors"
+                      >
+                        <Package className="w-4 h-4" /> My Orders
+                      </Link>
+                      <button
+                        onClick={handleSignOut}
+                        id="sign-out-btn"
+                        className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" /> Sign Out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  href="/auth"
+                  id="auth-btn"
+                  className="hidden md:flex p-2 rounded-full text-brand-muted hover:text-brand-brown hover:bg-brand-cream-dark transition-all duration-200"
+                  aria-label="Account"
+                >
+                  <User className="w-5 h-5" />
+                </Link>
+              )}
+              */}
 
               {/* Mobile hamburger */}
               <button
@@ -248,13 +318,31 @@ export default function Navbar() {
                   </Link>
                 )
               )}
-              <Link
-                href="/auth"
-                className="px-4 py-3 rounded-2xl text-sm font-medium text-brand-muted hover:text-brand-brown hover:bg-brand-cream-dark"
-                onClick={() => setMobileOpen(false)}
-              >
-                Login / Register
-              </Link>
+              {user ? (
+                <>
+                  <Link
+                    href="/order-tracking"
+                    className="px-4 py-3 rounded-2xl text-sm font-medium text-brand-muted hover:text-brand-brown hover:bg-brand-cream-dark"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    My Orders
+                  </Link>
+                  <button
+                    onClick={() => { handleSignOut(); setMobileOpen(false); }}
+                    className="w-full text-left px-4 py-3 rounded-2xl text-sm font-medium text-red-500 hover:bg-red-50"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/auth"
+                  className="px-4 py-3 rounded-2xl text-sm font-medium text-brand-muted hover:text-brand-brown hover:bg-brand-cream-dark"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Login / Register
+                </Link>
+              )}
             </nav>
           </div>
         )}

@@ -11,28 +11,33 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function InstagramSection() {
   return (
-    <section className="section-pad bg-brand-cream-dark">
+    <section className="py-12 md:py-16 bg-brand-cream/60 border-t border-brand-brown/5">
       <div className="container-brand">
-        <div className="text-center mb-10">
-          <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-2 inline-flex items-center gap-1.5 px-3.5 py-1 shadow-soft">
+        <div className="text-center mb-8 md:mb-12">
+          <a
+            href="https://www.instagram.com/pooja_handmade_art/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="badge-pink text-xs font-semibold uppercase tracking-wider mb-2.5 inline-flex items-center gap-1.5 px-3.5 py-1 shadow-soft hover:scale-105 transition-transform"
+          >
             <InstagramIcon className="w-3.5 h-3.5 text-brand-pink-dark" />
-            @poojahandmadeart
-          </span>
-          <h2 className="section-title">Follow Our Journey</h2>
-          <p className="section-subtitle">
-            See our latest creations on Instagram
+            @pooja_handmade_art
+          </a>
+          <h2 className="section-title text-2xl sm:text-3xl md:text-4xl">Follow Our Journey</h2>
+          <p className="section-subtitle text-xs sm:text-sm md:text-base mt-1">
+            See our latest handcrafted creations & Behind-the-Scenes on Instagram
           </p>
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3.5">
           {instagramImages.map((src, index) => (
             <a
               key={index}
-              href="https://instagram.com"
+              href="https://www.instagram.com/pooja_handmade_art/"
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative rounded-2xl overflow-hidden shadow-soft aspect-square"
+              className="group relative rounded-2xl overflow-hidden shadow-soft aspect-square border border-white/60"
               aria-label={`Instagram post ${index + 1}`}
             >
               <Image
@@ -41,8 +46,8 @@ export default function InstagramSection() {
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-brand-brown/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <InstagramIcon className="w-7 h-7 text-white" />
+              <div className="absolute inset-0 bg-brand-brown/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-xs">
+                <InstagramIcon className="w-6 h-6 sm:w-7 sm:h-7 text-white drop-shadow-md" />
               </div>
             </a>
           ))}
@@ -50,13 +55,13 @@ export default function InstagramSection() {
 
         <div className="text-center mt-8">
           <a
-            href="https://instagram.com"
+            href="https://www.instagram.com/pooja_handmade_art/"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-secondary inline-flex text-sm items-center gap-2 hover:bg-[#E4405F] hover:text-white hover:border-transparent transition-all"
+            className="btn-secondary text-xs sm:text-sm py-3 px-6 inline-flex items-center gap-2 hover:bg-[#E4405F] hover:text-white hover:border-transparent transition-all shadow-soft"
           >
             <InstagramIcon className="w-4 h-4" />
-            <span>Follow on Instagram</span>
+            <span>Follow @pooja_handmade_art on Instagram</span>
           </a>
         </div>
       </div>

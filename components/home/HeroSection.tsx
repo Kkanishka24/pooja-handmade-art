@@ -2,7 +2,25 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Sparkles, Star, Heart } from "lucide-react";
+import { ArrowRight, Heart } from "lucide-react";
+
+function FeltFlowerGreen({ className = "w-7 h-7" }: { className?: string }) {
+  return (
+    <svg className={`inline-block align-middle ${className}`} viewBox="0 0 32 32" fill="none">
+      <circle cx="16" cy="7" r="5" fill="#A8C5A0" />
+      <circle cx="16" cy="25" r="5" fill="#A8C5A0" />
+      <circle cx="7" cy="16" r="5" fill="#A8C5A0" />
+      <circle cx="25" cy="16" r="5" fill="#A8C5A0" />
+      <circle cx="9.6" cy="9.6" r="5" fill="#C8DFC4" />
+      <circle cx="22.4" cy="22.4" r="5" fill="#C8DFC4" />
+      <circle cx="9.6" cy="22.4" r="5" fill="#C8DFC4" />
+      <circle cx="22.4" cy="9.6" r="5" fill="#C8DFC4" />
+      <circle cx="16" cy="16" r="4.5" fill="#7DAD74" />
+      <circle cx="16" cy="16" r="2.5" fill="#F5D080" />
+      <path d="M14.5 16H17.5M16 14.5V17.5" stroke="#3D2B1F" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 export default function HeroSection() {
   return (
@@ -16,20 +34,12 @@ export default function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-start">
           {/* Left Content */}
           <div className="animate-fade-in pt-1">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm shadow-soft mb-4 border border-brand-pink/30">
-              <Sparkles className="w-4 h-4 text-brand-pink" />
-              <span className="text-xs md:text-sm font-semibold text-brand-brown">
-                100% Handmade with Love
-              </span>
-            </div>
-
             <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-6xl font-display font-bold text-brand-brown leading-tight mb-5">
-              Crafted by{" "}
-              <span className="text-gradient">Hand</span>,<br />
-              Made for Your{" "}
-              <span className="relative">
-                <span className="text-gradient">Heart</span>
+              Where Every Stitch<br />
+              Tells a{" "}
+              <span className="inline-inline-flex items-center text-brand-brown relative">
+                Story
+                <FeltFlowerGreen className="w-8 h-8 sm:w-10 sm:h-10 animate-float ml-1.5 -mt-1" />
                 <svg
                   className="absolute -bottom-2 left-0 w-full"
                   viewBox="0 0 200 12"
@@ -45,9 +55,10 @@ export default function HeroSection() {
               </span>
             </h1>
 
-            <p className="text-brand-muted text-base md:text-lg leading-relaxed mb-7 max-w-md">
-              Discover handcrafted felt products — nursery décor, festive
-              decorations, and personalized gifts. Every stitch tells a story.
+            <p className="text-brand-muted text-base md:text-lg leading-relaxed mb-7 max-w-lg">
+              Meticulously handcrafted by skilled women artisans, our creations
+              embody artistry, heritage craftsmanship and the spirit of women’s
+              empowerment.
             </p>
 
             <div className="flex flex-wrap gap-4">
@@ -55,100 +66,31 @@ export default function HeroSection() {
                 Shop Now
                 <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link href="/shop?custom=true" className="btn-secondary text-base px-7 md:px-8 py-3.5">
-                Custom Orders
+              <Link href="/shop?category=personalised-name" className="btn-secondary text-base px-7 md:px-8 py-3.5">
+                Personalised Name
                 <Heart className="w-5 h-5" />
               </Link>
             </div>
           </div>
 
-          {/* Right — Image Grid */}
+          {/* Right — Artisan Hero Image */}
           <div className="relative animate-slide-up animation-delay-200">
-            <div className="grid grid-cols-2 gap-3.5">
-              {/* Main large image */}
-              <div className="col-span-2 relative rounded-3xl md:rounded-4xl overflow-hidden shadow-card-hover h-56 sm:h-64 md:h-72 lg:h-76 group border border-brand-beige/50">
-                <Image
-                  src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=80"
-                  alt="Handmade felt nursery decoration"
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-brown/30 to-transparent" />
-                {/* Floating badge */}
-                <div className="absolute top-3.5 left-3.5 glass-card px-3.5 py-1.5 flex items-center gap-1.5">
-                  <Star className="w-4 h-4 text-brand-yellow fill-brand-yellow" />
-                  <span className="text-xs font-semibold text-brand-brown">
-                    Best Seller
-                  </span>
-                </div>
-              </div>
-
-              {/* Two smaller images */}
-              <div className="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-card h-32 sm:h-36 md:h-40 group border border-brand-beige/40">
-                <Image
-                  src="https://images.unsplash.com/photo-1576919228236-a097c32a5cd4?w=600&q=80"
-                  alt="Felt flower garland"
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              </div>
-              <div className="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-card h-32 sm:h-36 md:h-40 group border border-brand-beige/40">
-                <Image
-                  src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600&q=80"
-                  alt="Felt home decor"
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                {/* New badge */}
-                <div className="absolute top-2.5 right-2.5 badge-green text-xs font-semibold py-0.5 px-2.5 shadow-soft">
-                  <Sparkles className="w-3 h-3 text-brand-green-dark inline mr-0.5" /> New
-                </div>
-              </div>
-            </div>
-
-            {/* Floating decorative elements */}
-            <div className="absolute -top-3 -right-3 w-12 h-12 md:w-14 md:h-14 bg-brand-yellow rounded-full flex items-center justify-center shadow-card animate-bounce-soft">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/logo.png?v=2"
-                alt="Pooja Handmade Art"
-                className="w-7 h-7 md:w-8 md:h-8 rounded-full object-cover"
+            <div className="relative rounded-3xl md:rounded-4xl overflow-hidden shadow-card-hover border border-brand-beige/50 group max-w-md lg:max-w-none mx-auto h-[380px] sm:h-[450px] md:h-[480px]">
+              <Image
+                src="/images/artisan-hero.jpg"
+                alt="Women Artisan Handcrafting Felt Art"
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                priority
               />
-            </div>
-            <div className="absolute -bottom-3 -left-3 w-10 h-10 md:w-11 md:h-11 bg-brand-pink rounded-full flex items-center justify-center text-lg shadow-card animate-float">
-              <Sparkles className="w-5 h-5 text-brand-brown" />
-            </div>
-          </div>
-        </div>
-
-        {/* Combined Unified Glassmorphism Stats Card Bar */}
-        <div className="mt-10 md:mt-12 max-w-3xl mx-auto relative z-10">
-          <div className="bg-white/90 backdrop-blur-md border border-brand-pink/30 rounded-3xl p-5 md:p-6 shadow-soft hover:shadow-card transition-all duration-300">
-            <div className="grid grid-cols-3 divide-x divide-brand-beige text-center">
-              <div className="px-2 sm:px-4">
-                <div className="font-display font-bold text-2xl sm:text-3xl text-brand-brown">
-                  1,200+
-                </div>
-                <div className="text-brand-muted text-xs sm:text-sm font-medium mt-1">
-                  Happy Customers
-                </div>
-              </div>
-              <div className="px-2 sm:px-4">
-                <div className="font-display font-bold text-2xl sm:text-3xl text-brand-brown flex items-center justify-center gap-1">
-                  4.9 <Star className="w-5 h-5 text-brand-yellow fill-brand-yellow" />
-                </div>
-                <div className="text-brand-muted text-xs sm:text-sm font-medium mt-1">
-                  Average Rating
-                </div>
-              </div>
-              <div className="px-2 sm:px-4">
-                <div className="font-display font-bold text-2xl sm:text-3xl text-brand-brown">
-                  100%
-                </div>
-                <div className="text-brand-muted text-xs sm:text-sm font-medium mt-1">
-                  Handcrafted Felt
-                </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-80" />
+              <div className="absolute bottom-4 left-4 right-4 text-white">
+                <span className="text-[11px] font-semibold uppercase tracking-wider bg-brand-pink-dark/90 px-3 py-1 rounded-full shadow-soft inline-block mb-1">
+                  Heritage Craftsmanship
+                </span>
+                <p className="text-sm font-medium text-white/90 drop-shadow-sm">
+                  Handcrafted by empowered women artisans in the Himalayas
+                </p>
               </div>
             </div>
           </div>

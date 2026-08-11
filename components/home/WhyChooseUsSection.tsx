@@ -1,92 +1,51 @@
-import { Shield, Truck, Palette, Award, Heart, RefreshCw, HeartHandshake } from "lucide-react";
+import { Award, Palette, Truck, RefreshCw } from "lucide-react";
 
 const features = [
   {
-    icon: Heart,
-    title: "Made with Love",
-    description:
-      "Every single piece is hand-stitched by Pooja with genuine care and attention to detail.",
-    color: "bg-brand-pink-light",
-    iconColor: "text-brand-pink-dark",
-  },
-  {
     icon: Award,
-    title: "Premium Quality",
-    description:
-      "We use only the finest felt fabric and hypoallergenic fiber cotton for every product.",
-    color: "bg-brand-green-light",
-    iconColor: "text-brand-green-dark",
+    title: "Washable",
+    color: "bg-emerald-50 border-emerald-100",
+    iconColor: "text-emerald-700",
   },
   {
     icon: Palette,
-    title: "Custom Orders",
-    description:
-      "Want a personalized piece? We love creating bespoke crafts tailored just for you.",
-    color: "bg-brand-terracotta-light",
-    iconColor: "text-brand-terracotta",
+    title: "Personalised Name",
+    color: "bg-rose-50 border-rose-100",
+    iconColor: "text-rose-700",
   },
   {
     icon: Truck,
     title: "Pan India Shipping",
-    description:
-      "Fast and secure delivery across India. Free shipping on orders above ₹999.",
-    color: "bg-brand-lavender",
-    iconColor: "text-purple-600",
-  },
-  {
-    icon: Shield,
-    title: "Secure Packaging",
-    description:
-      "Every order is carefully packed with tissue, gift notes, and eco-friendly materials.",
-    color: "bg-brand-yellow",
-    iconColor: "text-amber-600",
+    color: "bg-purple-50 border-purple-100",
+    iconColor: "text-purple-700",
   },
   {
     icon: RefreshCw,
-    title: "Easy Returns",
-    description:
-      "Not happy? We offer hassle-free returns within 7 days of delivery.",
-    color: "bg-brand-cream-dark",
-    iconColor: "text-brand-muted",
+    title: "Easy 7-Day Returns",
+    color: "bg-amber-50 border-amber-100",
+    iconColor: "text-amber-700",
   },
 ];
 
 export default function WhyChooseUsSection() {
   return (
-    <section className="section-pad bg-brand-cream">
+    <section className="py-6 md:py-8 bg-brand-cream/80 border-y border-brand-brown/10">
       <div className="container-brand">
-        {/* Heading */}
-        <div className="text-center mb-14">
-          <span className="badge-green text-xs font-semibold uppercase tracking-wider mb-3 inline-flex items-center gap-1.5 px-3 py-1 shadow-soft">
-            <HeartHandshake className="w-3.5 h-3.5 text-brand-green-dark" />
-            Why We Stand Out
-          </span>
-          <h2 className="section-title">Why Choose Pooja Handmade Art?</h2>
-          <p className="section-subtitle max-w-xl mx-auto">
-            We put our heart and soul into every stitch — here&apos;s what makes us
-            different
-          </p>
-        </div>
-
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
+        {/* Features Grid: 2 columns on mobile, 4 columns on desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+          {features.map((feature) => (
             <div
               key={feature.title}
-              className="group card-soft hover:shadow-card transition-all duration-300 hover:-translate-y-1"
-              style={{ animationDelay: `${index * 100}ms` }}
+              className="flex items-center gap-3 p-3 sm:p-4 rounded-2xl bg-white/90 border border-brand-brown/8 shadow-soft hover:shadow-card hover:-translate-y-0.5 transition-all duration-300"
             >
               <div
-                className={`w-12 h-12 rounded-2xl ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}
+                className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl ${feature.color} border flex items-center justify-center shrink-0 shadow-xs`}
               >
-                <feature.icon className={`w-6 h-6 ${feature.iconColor}`} />
+                <feature.icon className={`w-5 h-5 ${feature.iconColor}`} />
               </div>
-              <h3 className="font-display font-semibold text-brand-brown text-lg mb-2">
+              <span className="font-display font-medium text-brand-brown text-xs sm:text-sm md:text-base leading-snug">
                 {feature.title}
-              </h3>
-              <p className="text-brand-muted text-sm leading-relaxed">
-                {feature.description}
-              </p>
+              </span>
             </div>
           ))}
         </div>
@@ -94,3 +53,5 @@ export default function WhyChooseUsSection() {
     </section>
   );
 }
+
+

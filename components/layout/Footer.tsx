@@ -4,8 +4,6 @@ import {
   Phone,
   MapPin,
   Heart,
-  Sparkles,
-  Share2,
 } from "lucide-react";
 
 // Official Social SVG Components
@@ -33,10 +31,12 @@ const YoutubeIcon = (props: React.SVGProps<SVGSVGElement>) => (
 const footerLinks = {
   shop: [
     { label: "All Products", href: "/shop" },
-    { label: "Nursery Décor", href: "/shop?category=nursery-decor" },
-    { label: "Festive Decorations", href: "/shop?category=festive-decorations" },
-    { label: "Home Décor", href: "/shop?category=home-decor" },
-    { label: "Gifts & Hampers", href: "/shop?category=gifts-hampers" },
+    { label: "Personalised Name", href: "/shop?category=personalised-name" },
+    { label: "Cute Plush Ornaments without Bell", href: "/shop?category=cute-plush-ornaments-without-bell" },
+    { label: "Cute Plush Ornaments with Bell", href: "/shop?category=cute-plush-ornaments-with-bell" },
+    { label: "Door and Wall Decor", href: "/shop?category=door-and-wall-decor" },
+    { label: "Festive Special Decor", href: "/shop?category=festive-special-decor" },
+    { label: "Garden Decor", href: "/shop?category=garden-decor" },
   ],
   info: [
     { label: "About Us", href: "/about" },
@@ -79,9 +79,8 @@ export default function Footer() {
             {/* Social Links */}
             <div className="flex items-center gap-3">
               {[
-                { icon: InstagramIcon, href: "https://instagram.com", label: "Instagram", hoverStyle: "hover:bg-[#E4405F] hover:text-white" },
-                { icon: FacebookIcon, href: "https://facebook.com", label: "Facebook", hoverStyle: "hover:bg-[#1877F2] hover:text-white" },
-                { icon: YoutubeIcon, href: "https://youtube.com", label: "YouTube", hoverStyle: "hover:bg-[#FF0000] hover:text-white" },
+                { icon: InstagramIcon, href: "https://www.instagram.com/pooja_handmade_art/", label: "Instagram", hoverStyle: "hover:bg-[#E4405F] hover:text-white" },
+                { icon: FacebookIcon, href: "https://www.facebook.com/profile.php?id=61592498323352", label: "Facebook", hoverStyle: "hover:bg-[#1877F2] hover:text-white" },
               ].map(({ icon: Icon, href, label, hoverStyle }) => (
                 <a
                   key={label}
@@ -144,49 +143,30 @@ export default function Footer() {
               <li className="flex items-start gap-3">
                 <Mail className="w-4 h-4 text-brand-pink mt-0.5 shrink-0" />
                 <a
-                  href="mailto:hello@poojahandmadeart.in"
+                  href="mailto:info@poojahandmadeart.in"
                   className="text-white/60 hover:text-brand-pink text-sm transition-colors duration-200"
                 >
-                  hello@poojahandmadeart.in
+                  info@poojahandmadeart.in
                 </a>
               </li>
               <li className="flex items-start gap-3">
                 <Phone className="w-4 h-4 text-brand-pink mt-0.5 shrink-0" />
                 <a
-                  href="tel:+919876543210"
+                  href="https://wa.me/919310261542"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-white/60 hover:text-brand-pink text-sm transition-colors duration-200"
                 >
-                  +91 98765 43210
+                  +91 93102 61542 (WhatsApp Only)
                 </a>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-brand-pink mt-0.5 shrink-0" />
                 <span className="text-white/60 text-sm">
-                  Mumbai, Maharashtra, India
+                  New Delhi, India
                 </span>
               </li>
             </ul>
-
-            {/* Newsletter mini */}
-            <div className="mt-6">
-              <p className="text-white/70 text-xs mb-2">
-                <Sparkles className="inline w-3 h-3 mr-1 text-brand-pink" />
-                Subscribe for new arrivals & offers
-              </p>
-              <form className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Your email"
-                  className="flex-1 px-3 py-2 rounded-xl bg-white/10 text-white placeholder:text-white/40 text-sm border border-white/20 focus:outline-none focus:border-brand-pink transition-colors"
-                />
-                <button
-                  type="submit"
-                  className="px-3 py-2 bg-brand-pink text-brand-brown text-sm font-semibold rounded-xl hover:bg-brand-pink-light transition-colors"
-                >
-                  Go
-                </button>
-              </form>
-            </div>
           </div>
         </div>
       </div>

@@ -36,6 +36,7 @@ export default function ProductDetailPage({
   const [selectedColor, setSelectedColor] = useState(
     product.colors?.[0] || ""
   );
+  const [customName, setCustomName] = useState("");
   const [addedToCart, setAddedToCart] = useState(false);
 
   const addItem = useCartStore((s) => s.addItem);
@@ -48,7 +49,7 @@ export default function ProductDetailPage({
     .slice(0, 4);
 
   const handleAddToCart = () => {
-    addItem(product, quantity, selectedColor);
+    addItem(product, quantity, selectedColor, customName);
     openCart();
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
@@ -56,8 +57,8 @@ export default function ProductDetailPage({
 
   const discount = product.compare_price
     ? Math.round(
-        ((product.compare_price - product.price) / product.compare_price) * 100
-      )
+      ((product.compare_price - product.price) / product.compare_price) * 100
+    )
     : 0;
 
   return (
@@ -176,6 +177,25 @@ export default function ProductDetailPage({
                   Out of Stock
                 </span>
               )}
+            </div>
+
+            {/* Personalization / Custom Name Input Box */}
+            <div className="bg-brand-pink-light/30 p-4 rounded-2xl border border-brand-pink/40 space-y-2 shadow-soft">
+              <label htmlFor="custom-name-input" className="block text-xs font-bold text-brand-brown uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-brand-pink-dark" />
+                Personalization Name / Wording :
+              </label>
+              <input
+                id="custom-name-input"
+                type="text"
+                value={customName}
+                onChange={(e) => setCustomName(e.target.value)}
+                placeholder="e.g. Aarav, Baby Maya, Happy Birthday Mom"
+                className="input-brand text-sm shadow-soft bg-white"
+              />
+              <p className="text-[11px] text-brand-muted">
+                Enter the name or custom wording you want our artisans to hand-stitch onto your craft.
+              </p>
             </div>
 
             {/* Color Selector & Qty Counter Inline */}
@@ -342,7 +362,7 @@ export default function ProductDetailPage({
                     </div>
                   </div>
                   <a
-                    href="https://wa.me/919876543210"
+                    href="https://wa.me/919310261542"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-brand-terracotta font-bold hover:underline shrink-0 ml-2 bg-white px-3 py-1.5 rounded-xl border border-brand-terracotta/30 shadow-soft"

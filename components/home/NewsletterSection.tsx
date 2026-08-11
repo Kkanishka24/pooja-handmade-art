@@ -6,15 +6,32 @@ import { Mail, Sparkles, ArrowRight, CheckCircle } from "lucide-react";
 export default function NewsletterSection() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [alreadySubscribed, setAlreadySubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800)); // Simulate API call
-    setSubmitted(true);
+    setError("");
+
+    const res = await fetch("/api/newsletter", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await res.json();
     setLoading(false);
+
+    if (!res.ok) {
+      setError("Something went wrong. Please try again.");
+      return;
+    }
+
+    setAlreadySubscribed(data.already);
+    setSubmitted(true);
   };
 
   return (
@@ -46,37 +63,44 @@ export default function NewsletterSection() {
             <div className="flex items-center justify-center gap-3 py-4 px-6 bg-white/80 rounded-3xl shadow-soft">
               <CheckCircle className="w-6 h-6 text-brand-green-dark" />
               <p className="font-semibold text-brand-brown">
-                You&apos;re subscribed! Welcome to our handmade community 🎉
+                {alreadySubscribed
+                  ? "You&apos;re already subscribed! 🎉"
+                  : "You're subscribed! Welcome to our handmade community 🎉"}
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                required
-                id="newsletter-email"
-                className="input-brand flex-1 shadow-soft"
-              />
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn-primary whitespace-nowrap shadow-pink"
-              >
-                {loading ? (
-                  <span className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-brand-brown/30 border-t-brand-brown rounded-full animate-spin" />
-                    Subscribing...
-                  </span>
-                ) : (
-                  <>
-                    Subscribe <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </button>
-            </form>
+            <>
+              {error && (
+                <p className="text-red-500 text-sm mb-3">{error}</p>
+              )}
+              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email address"
+                  required
+                  id="newsletter-email"
+                  className="input-brand flex-1 shadow-soft"
+                />
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-primary whitespace-nowrap shadow-pink"
+                >
+                  {loading ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-brand-brown/30 border-t-brand-brown rounded-full animate-spin" />
+                      Subscribing...
+                    </span>
+                  ) : (
+                    <>
+                      Subscribe <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </form>
+            </>
           )}
 
           <p className="text-brand-muted text-xs mt-4">

@@ -96,12 +96,9 @@ function ShopContent() {
   // Live category product count
   const getCategoryProductCount = (categorySlug: string) => {
     if (categorySlug === "all") return products.length;
-    return products.filter((p) => p.category.slug === categorySlug).length;
-  };
-
-  // Simulate short loading skeleton when switching categories or sorting
-  const getCategoryProductCount = (categorySlug: string) => {
-    if (categorySlug === "all") return products.length;
+    if (categorySlug === "personalised-name" || categorySlug === "custom-orders") {
+      return products.filter((p) => p.category.slug === "personalised-name" || p.category.slug === "custom-orders" || p.customizable === true).length;
+    }
     return products.filter((p) => p.category.slug === categorySlug).length;
   };
 
@@ -132,7 +129,13 @@ function ShopContent() {
     }
 
     if (selectedCategory !== "all") {
-      result = result.filter((p) => p.category.slug === selectedCategory);
+      if (selectedCategory === "personalised-name" || selectedCategory === "custom-orders") {
+        result = result.filter(
+          (p) => p.category.slug === "personalised-name" || p.category.slug === "custom-orders" || p.customizable === true
+        );
+      } else {
+        result = result.filter((p) => p.category.slug === selectedCategory);
+      }
     }
 
     result = result.filter(

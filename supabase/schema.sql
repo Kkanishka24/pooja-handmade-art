@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS orders (
   id               UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   order_number     TEXT NOT NULL UNIQUE,
   user_id          UUID REFERENCES profiles(id) ON DELETE SET NULL,
-  status           TEXT DEFAULT 'confirmed' CHECK (status IN ('pending','confirmed','processing','shipped','delivered','cancelled')),
+  status           TEXT DEFAULT 'confirmed' CHECK (status IN ('pending','confirmed','processing','shipped','out_for_delivery','delivered','cancelled')),
   subtotal         NUMERIC(10,2) NOT NULL,
   shipping         NUMERIC(10,2) DEFAULT 0,
   discount         NUMERIC(10,2) DEFAULT 0,
@@ -125,6 +125,17 @@ CREATE TABLE IF NOT EXISTS newsletter_subscriptions (
   id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   email      TEXT NOT NULL UNIQUE,
   name       TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- ─── Contact Messages ────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS contact_messages (
+  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name       TEXT NOT NULL,
+  email      TEXT NOT NULL,
+  subject    TEXT,
+  message    TEXT NOT NULL,
+  read       BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
