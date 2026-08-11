@@ -1,22 +1,25 @@
 "use client";
 
 import { Star, Quote, ChevronLeft, ChevronRight, Heart } from "lucide-react";
-import { useState } from "react";
+import { useRef } from "react";
 import { testimonials } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 export default function ReviewsSection() {
-  const [current, setCurrent] = useState(0);
-  const total = testimonials.length;
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const prev = () => setCurrent((c) => (c - 1 + total) % total);
-  const next = () => setCurrent((c) => (c + 1) % total);
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const scrollAmount = direction === "left" ? -400 : 400;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
 
   return (
     <section className="py-12 md:py-16 bg-gradient-to-b from-brand-cream/40 via-brand-cream/80 to-white overflow-hidden">
       <div className="container-brand">
         {/* Heading */}
-        <div className="text-center mb-10 md:mb-14">
+        <div className="text-center mb-8 md:mb-12">
           <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-2.5 inline-flex items-center gap-1.5 px-3.5 py-1 shadow-soft">
             <Heart className="w-3.5 h-3.5 text-brand-pink-dark fill-brand-pink/20" />
             Customer Reviews
@@ -44,48 +47,38 @@ export default function ReviewsSection() {
           </div>
         </div>
 
-        {/* Desktop: 3 column grid for all reviews */}
-        <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-          {testimonials.map((review) => (
-            <ReviewCard key={review.id} review={review} />
-          ))}
-        </div>
+        {/* Scrollable Container Wrapper */}
+        <div className="relative group px-1">
+          {/* Navigation Buttons for Desktop */}
+          <button
+            onClick={() => scroll("left")}
+            className="hidden md:flex items-center justify-center w-11 h-11 rounded-full bg-white/95 border border-brand-brown/10 shadow-card hover:bg-brand-pink-light hover:scale-105 active:scale-95 transition-all absolute top-1/2 -translate-y-1/2 -left-3 lg:-left-5 z-20"
+            aria-label="Scroll left"
+          >
+            <ChevronLeft className="w-5 h-5 text-brand-brown" />
+          </button>
+          <button
+            onClick={() => scroll("right")}
+            className="hidden md:flex items-center justify-center w-11 h-11 rounded-full bg-white/95 border border-brand-brown/10 shadow-card hover:bg-brand-pink-light hover:scale-105 active:scale-95 transition-all absolute top-1/2 -translate-y-1/2 -right-3 lg:-right-5 z-20"
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="w-5 h-5 text-brand-brown" />
+          </button>
 
-        {/* Mobile: Carousel */}
-        <div className="md:hidden">
-          <div className="relative">
-            <ReviewCard review={testimonials[current]} />
-            <div className="flex items-center justify-center gap-4 mt-5">
-              <button
-                onClick={prev}
-                className="p-2.5 rounded-full bg-white border border-brand-brown/10 shadow-soft hover:bg-brand-pink-light transition-all"
-                aria-label="Previous review"
+          {/* Horizontal Scroll Track */}
+          <div
+            ref={scrollRef}
+            className="flex gap-4 sm:gap-5 md:gap-6 overflow-x-auto snap-x snap-mandatory py-3 pb-6 [&::-webkit-scrollbar]:hidden"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {testimonials.map((review) => (
+              <div
+                key={review.id}
+                className="w-[280px] sm:w-[330px] md:w-[370px] shrink-0 snap-start flex flex-col"
               >
-                <ChevronLeft className="w-4 h-4 text-brand-brown" />
-              </button>
-              <div className="flex gap-1.5 flex-wrap justify-center">
-                {testimonials.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrent(i)}
-                    className={cn(
-                      "rounded-full transition-all duration-300",
-                      i === current
-                        ? "w-6 h-2 bg-brand-pink-dark"
-                        : "w-2 h-2 bg-brand-brown/20"
-                    )}
-                    aria-label={`Go to review ${i + 1}`}
-                  />
-                ))}
+                <ReviewCard review={review} />
               </div>
-              <button
-                onClick={next}
-                className="p-2.5 rounded-full bg-white border border-brand-brown/10 shadow-soft hover:bg-brand-pink-light transition-all"
-                aria-label="Next review"
-              >
-                <ChevronRight className="w-4 h-4 text-brand-brown" />
-              </button>
-            </div>
+            ))}
           </div>
         </div>
       </div>
