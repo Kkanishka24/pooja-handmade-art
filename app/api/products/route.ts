@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase-server";
 import { mapDbProduct } from "@/lib/db";
 import { Product } from "@/types";
+import { isCategoryMatch } from "@/lib/utils";
+import { products as staticProducts } from "@/lib/data";
 
 // GET: List products from Supabase
 export async function GET(request: Request) {
@@ -23,14 +25,22 @@ export async function GET(request: Request) {
 
   const { data, error } = await query;
 
-  if (error) {
-    console.error("Products fetch error:", error);
-    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
+  let dbProducts: Product[] = [];
+  if (!error && data) {
+    dbProducts = data.map(mapDbProduct);
   }
 
-  let result: Product[] = (data || []).map(mapDbProduct);
+  const dbSlugs = new Set(dbProducts.map((p) => p.slug));
+  const dbIds = new Set(dbProducts.map((p) => p.id));
 
-  if (category) result = result.filter((p) => p.category.slug === category);
+  // Merge static catalog products for full category coverage
+  const missingStatic = staticProducts.filter(
+    (p) => !dbSlugs.has(p.slug) && !dbIds.has(p.id)
+  );
+
+  let result: Product[] = [...dbProducts, ...missingStatic];
+
+  if (category) result = result.filter((p) => isCategoryMatch(p.category, category, p.customizable));
   if (featured === "true") result = result.filter((p) => p.is_featured);
   if (search) {
     const q = search.toLowerCase();

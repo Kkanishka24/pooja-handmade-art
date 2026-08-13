@@ -1,28 +1,40 @@
 import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase-server";
-import { mapDbCategory } from "@/lib/db";
+import { mapDbCategory, mapDbProduct } from "@/lib/db";
+import { categories as staticCategories, products as staticProducts } from "@/lib/data";
+import { isCategoryMatch } from "@/lib/utils";
+import { Product } from "@/types";
 
 // GET: Public categories with product counts
 export async function GET() {
   const supabase = createSupabaseAdminClient();
-  const { data, error } = await supabase
-    .from("categories")
-    .select("*, products ( id )")
-    .order("created_at", { ascending: true });
 
-  if (error) {
-    return NextResponse.json({ error: "Failed to fetch categories" }, { status: 500 });
+  const [catRes, prodRes] = await Promise.all([
+    supabase.from("categories").select("*").order("created_at", { ascending: true }),
+    supabase.from("products").select("*, categories ( id, name, slug, description, image )"),
+  ]);
+
+  let dbProducts: Product[] = [];
+  if (!prodRes.error && prodRes.data) {
+    dbProducts = prodRes.data.map(mapDbProduct);
   }
+  const dbSlugs = new Set(dbProducts.map((p) => p.slug));
+  const dbIds = new Set(dbProducts.map((p) => p.id));
+  const missingStatic = staticProducts.filter((p) => !dbSlugs.has(p.slug) && !dbIds.has(p.id));
+  const allProducts = [...dbProducts, ...missingStatic];
 
-  const categories = (data || []).map((row: { [key: string]: unknown }) => {
-    const { products, ...cat } = row as { products?: unknown[]; [key: string]: unknown };
+  let rawCats = !catRes.error && catRes.data && catRes.data.length > 0 ? catRes.data : staticCategories;
+
+  const categories = rawCats.map((cat: Record<string, unknown>) => {
+    const cSlug = String(cat.slug);
+    const count = allProducts.filter((p) => isCategoryMatch(p.category, cSlug, p.customizable)).length;
     return mapDbCategory({
       id: String(cat.id),
       name: String(cat.name),
-      slug: String(cat.slug),
-      description: cat.description as string | null,
-      image: cat.image as string | null,
-      product_count: Array.isArray(products) ? products.length : 0,
+      slug: cSlug,
+      description: (cat.description as string | null) || "",
+      image: (cat.image as string | null) || "",
+      product_count: count,
     });
   });
 

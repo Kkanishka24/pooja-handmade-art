@@ -1,4 +1,5 @@
 import { Category, Product, Review } from "@/types";
+import { isCategoryMatch } from "@/lib/utils";
 
 // ─── Categories ───────────────────────────────────────────────────────────────
 export const categories: Category[] = [
@@ -184,8 +185,8 @@ export const products: Product[] = [
     images: [
       "/images/products/felt-birds-mobile.jpg",
     ],
-    category: categories[4],
-    category_id: "5",
+    category: categories[1],
+    category_id: "2",
     stock: 6,
     is_featured: true,
     is_new: true,
@@ -199,6 +200,34 @@ export const products: Product[] = [
     colors: ["Multicolor Songbirds", "Deep Green Branch"],
     customizable: true,
     created_at: "2024-02-15",
+  },
+  {
+    id: "6",
+    name: "Bloom & Blossom Felt Garden Flower Stick",
+    slug: "bloom-blossom-felt-garden-flower-stick",
+    description:
+      "Charming handcrafted felt flower stick designed to add a bright burst of color to your indoor potted plants, balcony garden, or floral arrangements. Stitched with durable wool felt and mounted on a polished eco-friendly wooden stem.",
+    short_description: "Vibrant felt garden flower accent stick for indoor plants and balcony decor",
+    price: 349,
+    compare_price: 449,
+    images: [
+      "/images/products/diya-hanging-bells.jpg",
+    ],
+    category: categories[4],
+    category_id: "5",
+    stock: 18,
+    is_featured: false,
+    is_new: true,
+    is_bestseller: false,
+    tags: ["garden decor", "flower stick", "balcony accent", "handmade decor"],
+    rating: 4.8,
+    review_count: 14,
+    sku: "PHA-GAR-001",
+    weight: "90g",
+    materials: ["Wool Felt", "Wooden Stake", "Embroidery Floss"],
+    colors: ["Pink & Yellow"],
+    customizable: true,
+    created_at: "2024-02-20",
   },
 ];
 
@@ -810,4 +839,4 @@ export const getNewArrivals = () => products.filter((p) => p.is_new);
 export const getProductBySlug = (slug: string) =>
   products.find((p) => p.slug === slug);
 export const getProductsByCategory = (categorySlug: string) =>
-  products.filter((p) => p.category.slug === categorySlug);
+  products.filter((p) => isCategoryMatch(p.category, categorySlug, p.customizable));
