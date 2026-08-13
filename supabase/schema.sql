@@ -140,6 +140,17 @@ CREATE TABLE IF NOT EXISTS contact_messages (
 );
 
 -- ================================================================
+-- Grants (required — without these, API keys get "permission denied")
+-- ================================================================
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon, authenticated, service_role;
+
+-- ================================================================
 -- Indexes
 -- ================================================================
 CREATE INDEX IF NOT EXISTS idx_products_category    ON products(category_id);
@@ -201,13 +212,16 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
 -- ================================================================
--- Seed Categories
+-- Seed Categories (upsert — keeps existing rows in sync with shop)
 -- ================================================================
 INSERT INTO categories (name, slug, description, image) VALUES
-  ('Nursery Décor',          'nursery-decor',           'Adorable handcrafted pieces for your little one''s room',   'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=600&q=80'),
-  ('Festive Decorations',    'festive-decorations',     'Bring joy and color to every celebration',                  'https://images.unsplash.com/photo-1576919228236-a097c32a5cd4?w=600&q=80'),
-  ('Home Décor',             'home-decor',              'Handcrafted art to warm up your living spaces',             'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600&q=80'),
-  ('Gifts & Hampers',        'gifts-hampers',           'Unique handmade gifts for every occasion',                  'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=600&q=80'),
-  ('Wall Art',               'wall-art',                'Felt wall art to express your unique style',                'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80'),
-  ('Keychains & Accessories','keychains-accessories',   'Cute felt accessories for everyday carry',                  'https://images.unsplash.com/photo-1583394293214-4dfabf6a98d6?w=600&q=80')
-ON CONFLICT (slug) DO NOTHING;
+  ('Cute Plush Ornaments without Bell', 'cute-plush-ornaments-without-bell', 'Soft plush felt animals & cute ornaments hand-stitched without bells', '/images/products/felt-sleeping-bear.jpg'),
+  ('Cute Plush Ornaments with Bell',    'cute-plush-ornaments-with-bell',    'Charming plush felt ornaments featuring gentle chiming ghungroo bells', '/images/products/felt-birds-mobile.jpg'),
+  ('Door and Wall Decor',               'door-and-wall-decor',               'Whimsical hand-stitched felt branch hangings, torans, and wall art', '/images/products/owl-branch-hanging.jpg'),
+  ('Festive Special Decor',             'festive-special-decor',             'Vibrant handcrafted felt Diyas, tassels, torans & festive celebration accents', '/images/products/diya-hanging-tassels.jpg'),
+  ('Garden Decor',                      'garden-decor',                      'Enchanting nature-inspired felt birds, flowers, and outdoor balcony hangings', '/images/products/diya-hanging-bells.jpg'),
+  ('Personalised Name',                 'personalised-name',                 'Handcrafted felt creations with custom names, initials, and personalized colors', '/images/products/owl-branch-hanging.jpg')
+ON CONFLICT (slug) DO UPDATE SET
+  name        = EXCLUDED.name,
+  description = EXCLUDED.description,
+  image       = EXCLUDED.image;

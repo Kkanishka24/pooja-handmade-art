@@ -109,6 +109,7 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: "pooja-cart",
+      skipHydration: true,
     }
   )
 );

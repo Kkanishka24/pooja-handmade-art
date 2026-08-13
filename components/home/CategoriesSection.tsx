@@ -1,9 +1,28 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { categories } from "@/lib/data";
+import { Category } from "@/types";
 
 export default function CategoriesSection() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((res) => (res.ok ? res.json() : { categories: [] }))
+      .then((data) => {
+        setCategories(data.categories || []);
+        setLoading(false);
+      })
+      .catch(() => {
+        setCategories([]);
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <section className="py-12 md:py-16 bg-white relative overflow-hidden">
       <div className="container-brand relative z-10">
@@ -22,7 +41,13 @@ export default function CategoriesSection() {
 
         {/* Category Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4 md:gap-5">
-          {categories.map((cat, index) => (
+          {loading
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="rounded-2xl sm:rounded-3xl overflow-hidden shadow-soft border border-brand-brown/8">
+                  <div className="relative h-44 sm:h-48 md:h-56 bg-brand-cream animate-pulse" />
+                </div>
+              ))
+            : categories.map((cat, index) => (
             <Link
               key={cat.id}
               href={`/shop?category=${cat.slug}`}
@@ -35,13 +60,19 @@ export default function CategoriesSection() {
               >
                 {/* Image */}
                 <div className="relative h-44 sm:h-48 md:h-56">
-                  <Image
-                    src={cat.image}
-                    alt={cat.name}
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                    className="object-cover transition-transform duration-700 group-hover:scale-108"
-                  />
+                  {cat.image ? (
+                    <Image
+                      src={cat.image}
+                      alt={cat.name}
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-108"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-brand-cream-dark flex items-center justify-center">
+                      <Sparkles className="w-8 h-8 text-brand-pink/50" />
+                    </div>
+                  )}
                   {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-brand-brown/90 via-brand-brown/30 to-transparent transition-opacity duration-300 group-hover:from-brand-brown/95" />
                 </div>
@@ -49,7 +80,7 @@ export default function CategoriesSection() {
                 {/* Top Count Badge */}
                 <div className="absolute top-2.5 left-2.5 z-10">
                   <span className="bg-white/90 backdrop-blur-md text-brand-brown text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs border border-white/50">
-                    {cat.product_count} items
+                    {cat.product_count ?? 0} items
                   </span>
                 </div>
 

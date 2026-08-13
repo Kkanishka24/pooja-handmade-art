@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, Star, ShoppingCart, Sparkles, Feather, Palette, Tag } from "lucide-react";
+import { Heart, Star, ShoppingCart, Sparkles, WashingMachine, Tag } from "lucide-react";
 import { Product } from "@/types";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
@@ -106,26 +106,6 @@ export default function ProductCard({ product, className }: ProductCardProps) {
             <h3 className="font-display font-semibold text-brand-brown text-xs sm:text-sm md:text-base leading-snug line-clamp-2 min-h-[2.2rem] sm:min-h-[2.5rem] group-hover:text-brand-pink-dark transition-colors">
               {product.name}
             </h3>
-
-            {/* Rating */}
-            <div className="flex items-center gap-1 py-0.5">
-              <div className="flex items-center gap-0.5" aria-label={`Rating: ${product.rating} out of 5 stars`}>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={cn(
-                      "w-3 h-3 sm:w-3.5 sm:h-3.5",
-                      i < Math.floor(product.rating)
-                        ? "fill-brand-yellow text-brand-yellow"
-                        : "text-brand-beige fill-brand-beige"
-                    )}
-                  />
-                ))}
-              </div>
-              <span className="text-[10px] sm:text-xs text-brand-brown-light font-medium ml-1">
-                ({product.review_count})
-              </span>
-            </div>
           </div>
 
           <div className="pt-2 sm:pt-3 mt-auto">
@@ -154,15 +134,9 @@ export default function ProductCard({ product, className }: ProductCardProps) {
 
             {/* Feature badge slot */}
             <div className="mt-2 pt-1 min-h-[24px] sm:min-h-[28px] flex items-center">
-              {product.customizable ? (
-                <span className="text-[10px] sm:text-[11px] font-semibold text-brand-brown bg-brand-terracotta-light/60 border border-brand-terracotta/30 px-2 sm:px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
-                  <Palette className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-brand-terracotta shrink-0" /> Custom colors
-                </span>
-              ) : (
-                <span className="text-[10px] sm:text-[11px] font-medium text-brand-brown-light/80 bg-brand-cream-dark/80 border border-brand-beige/60 px-2 sm:px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
-                  <Feather className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-brand-green-dark shrink-0" /> 100% Handcrafted
-                </span>
-              )}
+              <span className="text-[10px] sm:text-[11px] font-semibold text-brand-brown bg-brand-terracotta-light/60 border border-brand-terracotta/30 px-2 sm:px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
+                <WashingMachine className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-brand-terracotta shrink-0" /> Washable
+              </span>
             </div>
           </div>
         </div>

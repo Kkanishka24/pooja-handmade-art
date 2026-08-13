@@ -1,11 +1,8 @@
 import Link from "next/link";
 import { ArrowRight, Flame } from "lucide-react";
-import ProductCard from "@/components/shop/ProductCard";
-import { getBestSellers } from "@/lib/data";
+import HomeProductGrid from "@/components/home/HomeProductGrid";
 
 export default function BestSellersSection() {
-  const products = getBestSellers().slice(0, 4);
-
   return (
     <section className="py-12 md:py-16 bg-gradient-to-b from-brand-cream/60 via-brand-cream to-brand-cream-dark/30">
       <div className="container-brand">
@@ -30,11 +27,7 @@ export default function BestSellersSection() {
         </div>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5 md:gap-6">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <HomeProductGrid filter="is_bestseller" limit={4} />
       </div>
     </section>
   );

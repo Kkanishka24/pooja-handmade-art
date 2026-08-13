@@ -13,18 +13,20 @@ import {
   Menu,
   X,
   LogOut,
+  FolderOpen,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 
 const navItems = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/products", label: "Products", icon: Package },
-  { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
-  { href: "/admin/customers", label: "Customers", icon: Users },
-  { href: "/admin/analytics", label: "Analytics", icon: BarChart2 },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/kan_9667_admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/kan_9667_admin/products", label: "Products", icon: Package },
+  { href: "/kan_9667_admin/categories", label: "Categories", icon: FolderOpen },
+  { href: "/kan_9667_admin/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/kan_9667_admin/customers", label: "Customers", icon: Users },
+  { href: "/kan_9667_admin/analytics", label: "Analytics", icon: BarChart2 },
+  { href: "/kan_9667_admin/settings", label: "Settings", icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

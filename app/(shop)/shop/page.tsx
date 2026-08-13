@@ -5,7 +5,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { SlidersHorizontal, Grid3X3, List, X, RotateCcw, Check, Sparkles } from "lucide-react";
 import ProductCard from "@/components/shop/ProductCard";
 import ProductCardSkeleton from "@/components/ui/ProductCardSkeleton";
-import { products, categories } from "@/lib/data";
+import { Product, Category } from "@/types";
 import { cn } from "@/lib/utils";
 
 const sortOptions = [
@@ -51,7 +51,26 @@ function ShopContent() {
 
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [view, setView] = useState<"grid" | "list">("grid");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  // Load products & categories from the database
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/products").then((res) => res.ok ? res.json() : { products: [] }),
+      fetch("/api/categories").then((res) => res.ok ? res.json() : { categories: [] }),
+    ])
+      .then(([pData, cData]) => {
+        setProducts(pData.products || []);
+        setCategories(cData.categories || []);
+      })
+      .catch(() => {
+        setProducts([]);
+        setCategories([]);
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
 
   // Lock body scroll on mobile when filter sidebar is toggled
   useEffect(() => {
@@ -89,9 +108,12 @@ function ShopContent() {
     if (searchQuery) params.set("search", searchQuery);
 
     const queryString = params.toString();
-    const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
-    router.replace(newUrl, { scroll: false });
-  }, [selectedCategory, sortBy, priceRange, selectedColor, inStockOnly, searchQuery, pathname, router]);
+    const currentQuery = searchParams.toString();
+    if (queryString !== currentQuery) {
+      const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
+      router.replace(newUrl, { scroll: false });
+    }
+  }, [selectedCategory, sortBy, priceRange, selectedColor, inStockOnly, searchQuery, pathname, router, searchParams]);
 
   // Live category product count
   const getCategoryProductCount = (categorySlug: string) => {

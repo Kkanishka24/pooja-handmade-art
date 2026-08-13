@@ -36,6 +36,12 @@ interface Product {
   categories?: { name: string; slug: string };
 }
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 interface NewProductForm {
   name: string;
   price: string;
@@ -64,6 +70,7 @@ const EMPTY_FORM: NewProductForm = {
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -87,6 +94,13 @@ export default function AdminProductsPage() {
   }, []);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
+
+  useEffect(() => {
+    fetch("/api/admin/categories")
+      .then((res) => res.ok ? res.json() : { categories: [] })
+      .then((data) => setCategories(data.categories || []))
+      .catch(() => setCategories([]));
+  }, []);
 
   const filtered = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -418,12 +432,9 @@ export default function AdminProductsPage() {
                   id="new-product-category"
                 >
                   <option value="">Select category...</option>
-                  <option value="nursery-decor">Nursery Décor</option>
-                  <option value="festive-decorations">Festive Decorations</option>
-                  <option value="home-decor">Home Décor</option>
-                  <option value="gifts-hampers">Gifts &amp; Hampers</option>
-                  <option value="wall-art">Wall Art</option>
-                  <option value="keychains-accessories">Keychains &amp; Accessories</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
                 </select>
               </div>
 

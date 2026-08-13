@@ -9,8 +9,8 @@ export async function proxy(request: NextRequest) {
   /*
   const { pathname } = request.nextUrl;
 
-  // Only protect /admin routes
-  if (!pathname.startsWith("/admin")) {
+  // Only protect /kan_9667_admin routes
+  if (!pathname.startsWith("/kan_9667_admin")) {
     return NextResponse.next();
   }
 
@@ -62,5 +62,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/kan_9667_admin/:path*"],
 };

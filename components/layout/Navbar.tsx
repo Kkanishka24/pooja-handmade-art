@@ -60,6 +60,11 @@ export default function Navbar() {
 
   useEffect(() => {
     setMounted(true);
+
+    // Persisted stores defer hydration until after mount to avoid hydration mismatches
+    useCartStore.persist.rehydrate();
+    useWishlistStore.persist.rehydrate();
+
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);

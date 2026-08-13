@@ -148,7 +148,7 @@ export default function AdminDashboard() {
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
             <h2 className="font-display font-semibold text-gray-900">Recent Orders</h2>
-            <a href="/admin/orders" className="text-brand-pink text-sm hover:underline">View all →</a>
+            <a href="/kan_9667_admin/orders" className="text-brand-pink text-sm hover:underline">View all →</a>
           </div>
           <div className="overflow-x-auto">
             {loading ? (
@@ -253,10 +253,10 @@ export default function AdminDashboard() {
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Add Product", href: "/admin/products", icon: "➕", color: "bg-brand-pink-light" },
-          { label: "View Orders", href: "/admin/orders", icon: "📦", color: "bg-brand-green-light" },
-          { label: "Customers", href: "/admin/customers", icon: "👥", color: "bg-brand-lavender" },
-          { label: "Analytics", href: "/admin/analytics", icon: "📊", color: "bg-brand-yellow" },
+          { label: "Add Product", href: "/kan_9667_admin/products", icon: "➕", color: "bg-brand-pink-light" },
+          { label: "View Orders", href: "/kan_9667_admin/orders", icon: "📦", color: "bg-brand-green-light" },
+          { label: "Customers", href: "/kan_9667_admin/customers", icon: "👥", color: "bg-brand-lavender" },
+          { label: "Analytics", href: "/kan_9667_admin/analytics", icon: "📊", color: "bg-brand-yellow" },
         ].map((action) => (
           <a
             key={action.label}
