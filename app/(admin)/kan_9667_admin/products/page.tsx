@@ -34,6 +34,7 @@ interface Product {
   sku: string;
   category_id?: string;
   description?: string;
+  colors: string[];
   categories?: { name: string; slug: string };
 }
 
@@ -51,6 +52,7 @@ interface ProductForm {
   sku: string;
   category_id: string;
   description: string;
+  colors: string;
   is_featured: boolean;
   is_bestseller: boolean;
   is_new: boolean;
@@ -64,6 +66,7 @@ const EMPTY_FORM: ProductForm = {
   sku: "",
   category_id: "",
   description: "",
+  colors: "",
   is_featured: false,
   is_bestseller: false,
   is_new: false,
@@ -132,6 +135,7 @@ export default function AdminProductsPage() {
       sku: product.sku || "",
       category_id: product.category_id || "",
       description: product.description || "",
+      colors: (product.colors || []).join(", "),
       is_featured: product.is_featured,
       is_bestseller: product.is_bestseller,
       is_new: product.is_new,
@@ -184,6 +188,10 @@ export default function AdminProductsPage() {
       sku: form.sku || null,
       category_id: form.category_id || null,
       description: form.description || null,
+      colors: form.colors
+        .split(",")
+        .map((c) => c.trim())
+        .filter(Boolean),
       images: uploadedImages,
       is_featured: form.is_featured,
       is_bestseller: form.is_bestseller,
@@ -506,6 +514,22 @@ export default function AdminProductsPage() {
                   id="product-field-description"
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-pink resize-none"
                 />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">
+                  Colors / Variants
+                </label>
+                <input
+                  id="product-field-colors"
+                  value={form.colors}
+                  onChange={(e) => setForm((f) => ({ ...f, colors: e.target.value }))}
+                  placeholder="e.g. Blush Pink, Sage Green, Rainbow"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-pink"
+                />
+                <p className="text-gray-400 text-xs mt-1">
+                  Comma-separated list — each color becomes a variant option on the product page.
+                </p>
               </div>
 
               {/* Flags */}
