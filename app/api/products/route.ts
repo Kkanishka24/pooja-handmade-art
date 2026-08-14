@@ -3,9 +3,8 @@ import { createSupabaseAdminClient } from "@/lib/supabase-server";
 import { mapDbProduct } from "@/lib/db";
 import { Product } from "@/types";
 import { isCategoryMatch } from "@/lib/utils";
-import { products as staticProducts } from "@/lib/data";
 
-// GET: List products from Supabase
+// GET: List products from Supabase (only admin-added products)
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const category = searchParams.get("category");
@@ -25,20 +24,10 @@ export async function GET(request: Request) {
 
   const { data, error } = await query;
 
-  let dbProducts: Product[] = [];
+  let result: Product[] = [];
   if (!error && data) {
-    dbProducts = data.map(mapDbProduct);
+    result = data.map(mapDbProduct);
   }
-
-  const dbSlugs = new Set(dbProducts.map((p) => p.slug));
-  const dbIds = new Set(dbProducts.map((p) => p.id));
-
-  // Merge static catalog products for full category coverage
-  const missingStatic = staticProducts.filter(
-    (p) => !dbSlugs.has(p.slug) && !dbIds.has(p.id)
-  );
-
-  let result: Product[] = [...dbProducts, ...missingStatic];
 
   if (category) result = result.filter((p) => isCategoryMatch(p.category, category, p.customizable));
   if (featured === "true") result = result.filter((p) => p.is_featured);

@@ -7,7 +7,7 @@ import ProductCard from "@/components/shop/ProductCard";
 import ProductCardSkeleton from "@/components/ui/ProductCardSkeleton";
 import { Product, Category } from "@/types";
 import { cn, isCategoryMatch, findCategory } from "@/lib/utils";
-import { categories as staticCategories, products as staticProducts } from "@/lib/data";
+
 
 const sortOptions = [
   { value: "newest", label: "Newest First" },
@@ -43,29 +43,22 @@ function ShopContent() {
 
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [view, setView] = useState<"grid" | "list">("grid");
-  const [products, setProducts] = useState<Product[]>(staticProducts);
-  const [categories, setCategories] = useState<Category[]>(staticCategories);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Background fetch to hydrate latest products/categories from Supabase
+  // Fetch products and categories from Supabase (admin-added only)
   useEffect(() => {
     Promise.all([
       fetch("/api/products").then((res) => (res.ok ? res.json() : { products: [] })),
       fetch("/api/categories").then((res) => (res.ok ? res.json() : { categories: [] })),
     ])
       .then(([pData, cData]) => {
-        if (pData.products && Array.isArray(pData.products) && pData.products.length > 0) {
-          const dbSlugs = new Set((pData.products as Product[]).map((p) => p.slug));
-          const dbIds = new Set((pData.products as Product[]).map((p) => p.id));
-          const missingStatic = staticProducts.filter(
-            (p) => !dbSlugs.has(p.slug) && !dbIds.has(p.id)
-          );
-          setProducts([...pData.products, ...missingStatic]);
-        }
-        if (cData.categories && Array.isArray(cData.categories) && cData.categories.length > 0) {
-          setCategories(cData.categories);
-        }
+        setProducts(Array.isArray(pData.products) ? pData.products : []);
+        setCategories(Array.isArray(cData.categories) ? cData.categories : []);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   // Lock body scroll on mobile when filter sidebar is toggled
@@ -666,7 +659,20 @@ function ShopContent() {
             )}
 
             {/* Product Grid */}
-            {filtered.length === 0 ? (
+            {loading ? (
+              <div
+                className={cn(
+                  "grid gap-4 md:gap-6",
+                  view === "grid"
+                    ? "grid-cols-2 md:grid-cols-2 lg:grid-cols-3"
+                    : "grid-cols-1"
+                )}
+              >
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="bg-white rounded-3xl p-12 text-center shadow-soft border border-brand-beige">
                 <div className="w-16 h-16 rounded-full bg-brand-cream-dark flex items-center justify-center mx-auto mb-4 border border-brand-beige shadow-soft">
                   <Sparkles className="w-8 h-8 text-brand-pink-dark" />
