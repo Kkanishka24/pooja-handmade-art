@@ -33,6 +33,7 @@ interface Product {
   review_count: number;
   sku: string;
   category_id?: string;
+  description?: string;
   categories?: { name: string; slug: string };
 }
 
@@ -42,7 +43,7 @@ interface Category {
   slug: string;
 }
 
-interface NewProductForm {
+interface ProductForm {
   name: string;
   price: string;
   compare_price: string;
@@ -55,7 +56,7 @@ interface NewProductForm {
   is_new: boolean;
 }
 
-const EMPTY_FORM: NewProductForm = {
+const EMPTY_FORM: ProductForm = {
   name: "",
   price: "",
   compare_price: "",
@@ -73,11 +74,15 @@ export default function AdminProductsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+
+  // Modal state — editingProduct is set when editing, null when adding
   const [showModal, setShowModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [form, setForm] = useState<NewProductForm>(EMPTY_FORM);
+  const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [saveError, setSaveError] = useState("");
@@ -107,6 +112,43 @@ export default function AdminProductsPage() {
     p.sku?.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Open modal for adding a new product
+  const openAddModal = () => {
+    setEditingProduct(null);
+    setForm(EMPTY_FORM);
+    setUploadedImages([]);
+    setSaveError("");
+    setShowModal(true);
+  };
+
+  // Open modal pre-filled with existing product data
+  const openEditModal = (product: Product) => {
+    setEditingProduct(product);
+    setForm({
+      name: product.name,
+      price: String(product.price),
+      compare_price: product.compare_price ? String(product.compare_price) : "",
+      stock: String(product.stock),
+      sku: product.sku || "",
+      category_id: product.category_id || "",
+      description: product.description || "",
+      is_featured: product.is_featured,
+      is_bestseller: product.is_bestseller,
+      is_new: product.is_new,
+    });
+    setUploadedImages(product.images || []);
+    setSaveError("");
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setEditingProduct(null);
+    setForm(EMPTY_FORM);
+    setUploadedImages([]);
+    setSaveError("");
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
@@ -134,16 +176,8 @@ export default function AdminProductsPage() {
     setSaving(true);
     setSaveError("");
 
-    // Build slug from name
-    const slug = form.name
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, "")
-      .trim()
-      .replace(/\s+/g, "-");
-
-    const payload = {
+    const payload: Record<string, unknown> = {
       name: form.name,
-      slug: `${slug}-${Date.now()}`,
       price: parseFloat(form.price),
       compare_price: form.compare_price ? parseFloat(form.compare_price) : null,
       stock: parseInt(form.stock) || 0,
@@ -156,16 +190,33 @@ export default function AdminProductsPage() {
       is_new: form.is_new,
     };
 
-    const res = await fetch("/api/admin/products", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    let res: Response;
+
+    if (editingProduct) {
+      // PATCH — update existing product
+      res = await fetch("/api/admin/products", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: editingProduct.id, ...payload }),
+      });
+    } else {
+      // POST — create new product
+      const slug = form.name
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .trim()
+        .replace(/\s+/g, "-");
+      payload.slug = `${slug}-${Date.now()}`;
+
+      res = await fetch("/api/admin/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    }
 
     if (res.ok) {
-      setShowModal(false);
-      setForm(EMPTY_FORM);
-      setUploadedImages([]);
+      closeModal();
       fetchProducts();
     } else {
       const err = await res.json();
@@ -181,6 +232,8 @@ export default function AdminProductsPage() {
     setDeleteId(null);
     setDeleting(false);
   };
+
+  const isEditing = !!editingProduct;
 
   return (
     <div className="space-y-5">
@@ -202,7 +255,7 @@ export default function AdminProductsPage() {
           </button>
           <button
             id="add-product-btn"
-            onClick={() => { setShowModal(true); setSaveError(""); setForm(EMPTY_FORM); setUploadedImages([]); }}
+            onClick={openAddModal}
             className="btn-primary text-sm"
           >
             <Plus className="w-4 h-4" /> Add Product
@@ -319,6 +372,7 @@ export default function AdminProductsPage() {
                           <Eye className="w-4 h-4" />
                         </a>
                         <button
+                          onClick={() => openEditModal(product)}
                           className="p-1.5 rounded-lg hover:bg-brand-pink-light text-gray-500 hover:text-brand-pink-dark transition-colors"
                           aria-label="Edit"
                         >
@@ -341,14 +395,16 @@ export default function AdminProductsPage() {
         </div>
       </div>
 
-      {/* Add Product Modal */}
+      {/* Add / Edit Product Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl animate-slide-up">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <h2 className="font-display font-bold text-xl text-brand-brown">Add New Product</h2>
+              <h2 className="font-display font-bold text-xl text-brand-brown">
+                {isEditing ? "Edit Product" : "Add New Product"}
+              </h2>
               <button
-                onClick={() => setShowModal(false)}
+                onClick={closeModal}
                 className="p-2 rounded-full hover:bg-gray-100 text-gray-500"
               >
                 <X className="w-5 h-5" />
@@ -370,7 +426,7 @@ export default function AdminProductsPage() {
                     <Upload className="w-8 h-8 text-brand-muted mx-auto mb-2" />
                   )}
                   <p className="text-brand-muted text-sm">
-                    {uploading ? "Uploading..." : <>Drop images here or <span className="text-brand-pink font-medium">browse</span></>}
+                    {uploading ? "Uploading..." : <><span className="text-brand-pink font-medium">Click to upload</span> or drop images here</>}
                   </p>
                   <p className="text-gray-400 text-xs mt-1">PNG, JPG up to 5MB</p>
                 </div>
@@ -412,8 +468,8 @@ export default function AdminProductsPage() {
                     {field.label}
                   </label>
                   <input
-                    id={`new-product-${field.key}`}
-                    value={form[field.key as keyof NewProductForm] as string}
+                    id={`product-field-${field.key}`}
+                    value={form[field.key as keyof ProductForm] as string}
                     onChange={(e) => setForm((f) => ({ ...f, [field.key]: e.target.value }))}
                     placeholder={field.placeholder}
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-pink"
@@ -429,7 +485,7 @@ export default function AdminProductsPage() {
                   value={form.category_id}
                   onChange={(e) => setForm((f) => ({ ...f, category_id: e.target.value }))}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-pink"
-                  id="new-product-category"
+                  id="product-field-category"
                 >
                   <option value="">Select category...</option>
                   {categories.map((cat) => (
@@ -447,7 +503,7 @@ export default function AdminProductsPage() {
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                   placeholder="Product description..."
-                  id="new-product-description"
+                  id="product-field-description"
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-pink resize-none"
                 />
               </div>
@@ -462,7 +518,7 @@ export default function AdminProductsPage() {
                   <label key={key} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={form[key as keyof NewProductForm] as boolean}
+                      checked={form[key as keyof ProductForm] as boolean}
                       onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.checked }))}
                       className="w-4 h-4 accent-brand-pink"
                     />
@@ -477,7 +533,7 @@ export default function AdminProductsPage() {
 
               <div className="flex gap-3 pt-2">
                 <button
-                  onClick={() => setShowModal(false)}
+                  onClick={closeModal}
                   className="btn-ghost flex-1 border border-gray-200"
                 >
                   Cancel
@@ -490,10 +546,11 @@ export default function AdminProductsPage() {
                 >
                   {saving ? (
                     <span className="flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {isEditing ? "Updating..." : "Saving..."}
                     </span>
                   ) : (
-                    "Save Product"
+                    isEditing ? "Update Product" : "Save Product"
                   )}
                 </button>
               </div>
