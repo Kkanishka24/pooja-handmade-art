@@ -124,7 +124,7 @@ export default function CartDrawer() {
           ) : (
             items.map((item, idx) => (
               <div
-                key={`${item.product.id}-${item.customName || ""}-${idx}`}
+                key={`${item.product.id}-${item.selectedColor || ""}-${item.customName || ""}-${idx}`}
                 className="flex gap-4 p-3 bg-brand-cream/60 border border-brand-beige/60 rounded-2xl transition-all hover:bg-brand-cream"
               >
                 <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0 border border-brand-beige">
@@ -147,12 +147,17 @@ export default function CartDrawer() {
                       ✨ Custom Name: &quot;{item.customName}&quot;
                     </p>
                   )}
+                  {item.selectedColor && (
+                    <p className="text-[11px] font-medium text-brand-brown-light mt-1">
+                      🎨 Color: <span className="font-semibold text-brand-brown">{item.selectedColor}</span>
+                    </p>
+                  )}
                   <div className="flex items-center justify-between mt-1">
                     {/* Quantity */}
                     <div className="flex items-center gap-1 bg-white rounded-full p-0.5 shadow-soft border border-brand-beige">
                       <button
                         onClick={() =>
-                          updateQuantity(item.product.id, item.quantity - 1, item.customName)
+                          updateQuantity(item.product.id, item.quantity - 1, item.customName, item.selectedColor)
                         }
                         className="w-6 h-6 rounded-full hover:bg-brand-cream-dark flex items-center justify-center transition-colors text-brand-brown"
                         aria-label="Decrease quantity"
@@ -164,7 +169,7 @@ export default function CartDrawer() {
                       </span>
                       <button
                         onClick={() =>
-                          updateQuantity(item.product.id, item.quantity + 1, item.customName)
+                          updateQuantity(item.product.id, item.quantity + 1, item.customName, item.selectedColor)
                         }
                         className="w-6 h-6 rounded-full hover:bg-brand-cream-dark flex items-center justify-center transition-colors text-brand-brown"
                         aria-label="Increase quantity"
@@ -178,7 +183,7 @@ export default function CartDrawer() {
                   </div>
                 </div>
                 <button
-                  onClick={() => removeItem(item.product.id, item.customName)}
+                  onClick={() => removeItem(item.product.id, item.customName, item.selectedColor)}
                   className="p-1.5 rounded-full hover:bg-red-50 text-brand-brown-light/60 hover:text-red-600 transition-colors self-start shrink-0"
                   aria-label="Remove item"
                 >

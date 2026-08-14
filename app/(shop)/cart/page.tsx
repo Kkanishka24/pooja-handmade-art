@@ -119,7 +119,7 @@ export default function CartPage() {
                           <div className="flex items-center gap-2 bg-brand-cream rounded-2xl border border-brand-beige/80 px-2 py-1 shadow-inner-soft">
                             <button
                               onClick={() =>
-                                updateQuantity(item.product.id, item.quantity - 1, item.customName)
+                                updateQuantity(item.product.id, item.quantity - 1, item.customName, item.selectedColor)
                               }
                               className="w-7 h-7 rounded-xl hover:bg-white flex items-center justify-center transition-colors text-brand-brown"
                               aria-label="Decrease"
@@ -131,7 +131,7 @@ export default function CartPage() {
                             </span>
                             <button
                               onClick={() =>
-                                updateQuantity(item.product.id, item.quantity + 1, item.customName)
+                                updateQuantity(item.product.id, item.quantity + 1, item.customName, item.selectedColor)
                               }
                               className="w-7 h-7 rounded-xl hover:bg-white flex items-center justify-center transition-colors text-brand-brown"
                               aria-label="Increase"
@@ -145,7 +145,7 @@ export default function CartPage() {
                               {formatPrice(item.product.price * item.quantity)}
                             </span>
                             <button
-                              onClick={() => removeItem(item.product.id, item.customName)}
+                              onClick={() => removeItem(item.product.id, item.customName, item.selectedColor)}
                               className="p-2 rounded-full hover:bg-red-50 text-brand-muted hover:text-red-500 transition-colors"
                               aria-label="Remove item"
                             >

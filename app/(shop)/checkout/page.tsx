@@ -361,7 +361,7 @@ export default function CheckoutPage() {
 
               <div className="space-y-3 max-h-72 overflow-y-auto pr-1 mb-5 divide-y divide-brand-beige/40">
                 {items.map((item) => (
-                  <div key={item.product.id} className="pt-3 first:pt-0 flex gap-3 items-center">
+                  <div key={`${item.product.id}-${item.selectedColor || ""}-${item.customName || ""}`} className="pt-3 first:pt-0 flex gap-3 items-center">
                     <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-brand-beige">
                       <Image
                         src={item.product.images[0]}

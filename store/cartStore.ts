@@ -8,8 +8,8 @@ interface CartStore {
   items: CartItem[];
   isOpen: boolean;
   addItem: (product: Product, quantity?: number, color?: string, customName?: string) => void;
-  removeItem: (productId: string, customName?: string) => void;
-  updateQuantity: (productId: string, quantity: number, customName?: string) => void;
+  removeItem: (productId: string, customName?: string, color?: string) => void;
+  updateQuantity: (productId: string, quantity: number, customName?: string, color?: string) => void;
   clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
@@ -54,27 +54,29 @@ export const useCartStore = create<CartStore>()(
         });
       },
 
-      removeItem: (productId, customName) => {
+      removeItem: (productId, customName, color) => {
         set((state) => ({
           items: state.items.filter(
             (item) =>
               !(
                 item.product.id === productId &&
-                (customName === undefined || item.customName === customName)
+                (customName === undefined || item.customName === customName) &&
+                (color === undefined || item.selectedColor === color)
               )
           ),
         }));
       },
 
-      updateQuantity: (productId, quantity, customName) => {
+      updateQuantity: (productId, quantity, customName, color) => {
         if (quantity <= 0) {
-          get().removeItem(productId, customName);
+          get().removeItem(productId, customName, color);
           return;
         }
         set((state) => ({
           items: state.items.map((item) =>
             item.product.id === productId &&
-            (customName === undefined || item.customName === customName)
+            (customName === undefined || item.customName === customName) &&
+            (color === undefined || item.selectedColor === color)
               ? { ...item, quantity }
               : item
           ),
