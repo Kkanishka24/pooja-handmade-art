@@ -35,6 +35,7 @@ interface Product {
   category_id?: string;
   description?: string;
   colors: string[];
+  materials: string[];
   categories?: { name: string; slug: string };
 }
 
@@ -53,6 +54,7 @@ interface ProductForm {
   category_id: string;
   description: string;
   colors: string;
+  materials: string;
   is_featured: boolean;
   is_bestseller: boolean;
   is_new: boolean;
@@ -67,6 +69,7 @@ const EMPTY_FORM: ProductForm = {
   category_id: "",
   description: "",
   colors: "",
+  materials: "",
   is_featured: false,
   is_bestseller: false,
   is_new: false,
@@ -136,6 +139,7 @@ export default function AdminProductsPage() {
       category_id: product.category_id || "",
       description: product.description || "",
       colors: (product.colors || []).join(", "),
+      materials: (product.materials || []).join(", "),
       is_featured: product.is_featured,
       is_bestseller: product.is_bestseller,
       is_new: product.is_new,
@@ -191,6 +195,10 @@ export default function AdminProductsPage() {
       colors: form.colors
         .split(",")
         .map((c) => c.trim())
+        .filter(Boolean),
+      materials: form.materials
+        .split(",")
+        .map((m) => m.trim())
         .filter(Boolean),
       images: uploadedImages,
       is_featured: form.is_featured,
@@ -529,6 +537,22 @@ export default function AdminProductsPage() {
                 />
                 <p className="text-gray-400 text-xs mt-1">
                   Comma-separated list — each color becomes a variant option on the product page.
+                </p>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">
+                  Materials Used
+                </label>
+                <input
+                  id="product-field-materials"
+                  value={form.materials}
+                  onChange={(e) => setForm((f) => ({ ...f, materials: e.target.value }))}
+                  placeholder="e.g. Premium Wool Felt, Wooden Beads, Brass Bells"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-brand-pink"
+                />
+                <p className="text-gray-400 text-xs mt-1">
+                  Comma-separated list — shown as chips in the "Materials Used" section on the product page.
                 </p>
               </div>
 
