@@ -103,7 +103,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
         <div className="p-3 sm:p-4 md:p-5 flex-1 flex flex-col justify-between">
           <div className="space-y-1 sm:space-y-1.5">
             <p className="text-brand-brown-light text-[10px] sm:text-xs font-semibold uppercase tracking-wider">{product.category.name}</p>
-            <h3 className="font-display font-semibold text-brand-brown text-xs sm:text-sm md:text-base leading-snug line-clamp-2 min-h-[2.2rem] sm:min-h-[2.5rem] group-hover:text-brand-pink-dark transition-colors">
+            <h3 className="font-display font-semibold text-brand-brown text-xs sm:text-sm md:text-base leading-snug min-h-[2.2rem] sm:min-h-[2.5rem] group-hover:text-brand-pink-dark transition-colors">
               {product.name}
             </h3>
           </div>
