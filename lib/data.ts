@@ -824,12 +824,12 @@ export const testimonials: Review[] = [
 
 // ─── Instagram Gallery ────────────────────────────────────────────────────────
 export const instagramImages = [
-  "/images/products/diya-hanging-bells.jpg",
-  "/images/products/diya-hanging-tassels.jpg",
-  "/images/products/owl-branch-hanging.jpg",
-  "/images/products/felt-sleeping-bear.jpg",
-  "/images/products/felt-birds-mobile.jpg",
-  "/images/products/owl-branch-hanging.jpg",
+  "/images/insta-1.png",
+  "/images/insta-2.png",
+  "/images/insta-3.png",
+  "/images/insta-4.png",
+  "/images/insta-5.png",
+  "/images/insta-6.png",
 ];
 
 // Helpers
