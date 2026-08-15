@@ -37,6 +37,7 @@ export default function ProductDetailPage({
   const [selectedColor, setSelectedColor] = useState("");
   const [customName, setCustomName] = useState("");
   const [addedToCart, setAddedToCart] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartStore((s) => s.openCart);
@@ -86,6 +87,35 @@ export default function ProductDetailPage({
     openCart();
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
+  };
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/shop/${product.slug}`;
+    const shareData = {
+      title: product.name,
+      text: `Check out ${product.name} on Pooja Handmade Art!`,
+      url,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch {
+        return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const input = document.createElement("textarea");
+      input.value = url;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("copy");
+      input.remove();
+    }
+    setShareCopied(true);
+    setTimeout(() => setShareCopied(false), 2000);
   };
 
   const discount = product.compare_price
@@ -312,10 +342,20 @@ export default function ProductDetailPage({
                 </button>
 
                 <button
-                  className="p-3.5 rounded-full border border-brand-beige hover:border-brand-pink text-brand-brown-light hover:text-brand-brown transition-all duration-200"
+                  onClick={handleShare}
+                  className={cn(
+                    "p-3.5 rounded-full border transition-all duration-200",
+                    shareCopied
+                      ? "border-brand-green bg-brand-green-light"
+                      : "border-brand-beige hover:border-brand-pink text-brand-brown-light hover:text-brand-brown"
+                  )}
                   aria-label="Share product"
                 >
-                  <Share2 className="w-4 h-4" />
+                  {shareCopied ? (
+                    <Check className="w-4 h-4 text-brand-green-dark" />
+                  ) : (
+                    <Share2 className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
