@@ -32,13 +32,9 @@ export default function InstagramSection() {
         {/* Grid */}
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3.5">
           {instagramImages.map((src, index) => (
-            <a
+            <div
               key={index}
-              href="https://www.instagram.com/pooja_handmade_art/"
-              target="_blank"
-              rel="noopener noreferrer"
               className="group relative rounded-2xl overflow-hidden shadow-soft aspect-square border border-white/60"
-              aria-label={`Instagram post ${index + 1}`}
             >
               <Image
                 src={src}
@@ -49,7 +45,7 @@ export default function InstagramSection() {
               <div className="absolute inset-0 bg-brand-brown/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-xs">
                 <InstagramIcon className="w-6 h-6 sm:w-7 sm:h-7 text-white drop-shadow-md" />
               </div>
-            </a>
+            </div>
           ))}
         </div>
 
