@@ -92,17 +92,24 @@ function ShopContent() {
   const handleCategoryChange = (catSlug: string) => {
     updateFilters({ category: catSlug });
   };
+// Simulate short loading skeleton when switching categories or sorting
+const handleCategoryChange = (catSlug: string) => {
+  setIsLoading(true);
+  setSelectedCategory(catSlug);
+  updateFilters({ category: catSlug });
+  setTimeout(() => setIsLoading(false), 250);
+};
 
-  const handleSortChange = (sortVal: string) => {
-    updateFilters({ sort: sortVal });
-  };
+const handleSortChange = (sortVal: string) => {
+  updateFilters({ sort: sortVal });
+};
 
-  const handlePriceRangeChange = (range: [number, number]) => {
-    updateFilters({
-      minPrice: range[0] > 0 ? range[0] : null,
-      maxPrice: range[1] < 2000 ? range[1] : null,
-    });
-  };
+const handlePriceRangeChange = (range: [number, number]) => {
+  updateFilters({
+    minPrice: range[0] > 0 ? range[0] : null,
+    maxPrice: range[1] < 2000 ? range[1] : null,
+  });
+};
 
   const handleColorChange = (color: string) => {
     updateFilters({ color: color === selectedColor ? null : color });
