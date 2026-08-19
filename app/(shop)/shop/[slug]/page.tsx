@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, useEffect, use } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
@@ -15,13 +15,14 @@ import {
   RefreshCw,
   MessageCircle,
 } from "lucide-react";
-import { products } from "@/lib/data";
+import { Product } from "@/types";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import ProductCard from "@/components/shop/ProductCard";
 import ProductImageGallery from "@/components/shop/ProductImageGallery";
+import ProductCardSkeleton from "@/components/ui/ProductCardSkeleton";
 
 export default function ProductDetailPage({
   params,
@@ -29,35 +30,98 @@ export default function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
-  const product = products.find((p) => p.slug === slug);
-  if (!product) notFound();
-
+  const [product, setProduct] = useState<Product | null>(null);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const [selectedColor, setSelectedColor] = useState(
-    product.colors?.[0] || ""
-  );
+  const [selectedColor, setSelectedColor] = useState("");
+  const [customName, setCustomName] = useState("");
   const [addedToCart, setAddedToCart] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartStore((s) => s.openCart);
   const { toggleItem, isWishlisted } = useWishlistStore();
+
+  useEffect(() => {
+    Promise.all([
+      fetch(`/api/products?slug=${encodeURIComponent(slug)}`).then((res) => res.ok ? res.json() : { products: [] }),
+      fetch("/api/products").then((res) => res.ok ? res.json() : { products: [] }),
+    ])
+      .then(([detailData, listData]) => {
+        const found = detailData.products?.[0] || null;
+        setProduct(found);
+        setAllProducts(listData.products || []);
+        setSelectedColor(found?.colors?.[0] || "");
+        setLoading(false);
+      })
+      .catch(() => {
+        setProduct(null);
+        setAllProducts([]);
+        setLoading(false);
+      });
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="bg-brand-cream min-h-screen container-brand py-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) notFound();
+
   const wishlisted = isWishlisted(product.id);
 
-  const relatedProducts = products
+  const relatedProducts = allProducts
     .filter((p) => p.category.id === product.category.id && p.id !== product.id)
     .slice(0, 4);
 
   const handleAddToCart = () => {
-    addItem(product, quantity, selectedColor);
+    addItem(product, quantity, selectedColor, customName);
     openCart();
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
   };
 
+  const handleShare = async () => {
+    const url = `${window.location.origin}/shop/${product.slug}`;
+    const shareData = {
+      title: product.name,
+      text: `Check out ${product.name} on Pooja Handmade Art!`,
+      url,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch {
+        return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const input = document.createElement("textarea");
+      input.value = url;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("copy");
+      input.remove();
+    }
+    setShareCopied(true);
+    setTimeout(() => setShareCopied(false), 2000);
+  };
+
   const discount = product.compare_price
     ? Math.round(
-        ((product.compare_price - product.price) / product.compare_price) * 100
-      )
+      ((product.compare_price - product.price) / product.compare_price) * 100
+    )
     : 0;
 
   return (
@@ -123,27 +187,6 @@ export default function ProductDetailPage({
                 <p className="text-brand-pink-dark text-xs font-bold uppercase tracking-wider">
                   {product.category.name}
                 </p>
-                <div className="flex items-center gap-1.5">
-                  <div className="flex items-center gap-0.5">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={cn(
-                          "w-3.5 h-3.5",
-                          i < Math.floor(product.rating)
-                            ? "fill-brand-yellow text-brand-yellow"
-                            : "text-brand-beige fill-brand-beige"
-                        )}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-brand-brown font-bold text-xs">
-                    {product.rating}
-                  </span>
-                  <span className="text-brand-brown-light text-xs">
-                    ({product.review_count} reviews)
-                  </span>
-                </div>
               </div>
 
               <h1 className="font-display font-bold text-brand-brown text-2xl lg:text-3xl leading-tight">
@@ -177,6 +220,27 @@ export default function ProductDetailPage({
                 </span>
               )}
             </div>
+
+            {/* Personalization / Custom Name Input Box */}
+            {product.category.slug === "personalised-name" && (
+            <div className="bg-brand-pink-light/30 p-4 rounded-2xl border border-brand-pink/40 space-y-2 shadow-soft">
+              <label htmlFor="custom-name-input" className="block text-xs font-bold text-brand-brown uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-brand-pink-dark" />
+                Personalization Name / Wording :
+              </label>
+              <input
+                id="custom-name-input"
+                type="text"
+                value={customName}
+                onChange={(e) => setCustomName(e.target.value)}
+                placeholder="e.g. Aarav, Baby Maya, Happy Birthday Mom"
+                className="input-brand text-sm shadow-soft bg-white"
+              />
+              <p className="text-[11px] text-brand-muted">
+                Enter the name or custom wording you want our artisans to hand-stitch onto your craft.
+              </p>
+            </div>
+            )}
 
             {/* Color Selector & Qty Counter Inline */}
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -278,10 +342,20 @@ export default function ProductDetailPage({
                 </button>
 
                 <button
-                  className="p-3.5 rounded-full border border-brand-beige hover:border-brand-pink text-brand-brown-light hover:text-brand-brown transition-all duration-200"
+                  onClick={handleShare}
+                  className={cn(
+                    "p-3.5 rounded-full border transition-all duration-200",
+                    shareCopied
+                      ? "border-brand-green bg-brand-green-light"
+                      : "border-brand-beige hover:border-brand-pink text-brand-brown-light hover:text-brand-brown"
+                  )}
                   aria-label="Share product"
                 >
-                  <Share2 className="w-4 h-4" />
+                  {shareCopied ? (
+                    <Check className="w-4 h-4 text-brand-green-dark" />
+                  ) : (
+                    <Share2 className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
@@ -342,7 +416,7 @@ export default function ProductDetailPage({
                     </div>
                   </div>
                   <a
-                    href="https://wa.me/919876543210"
+                    href="https://wa.me/919310261542"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-brand-terracotta font-bold hover:underline shrink-0 ml-2 bg-white px-3 py-1.5 rounded-xl border border-brand-terracotta/30 shadow-soft"

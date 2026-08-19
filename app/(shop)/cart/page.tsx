@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   Truck,
   Tag,
+  MessageCircle,
 } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/utils";
@@ -77,9 +78,9 @@ export default function CartPage() {
               <div className="lg:col-span-7 space-y-5">
                 {/* Cart Items List */}
                 <div className="divide-y divide-brand-beige/60">
-                  {items.map((item) => (
+                  {items.map((item, idx) => (
                     <div
-                      key={item.product.id}
+                      key={`${item.product.id}-${item.customName || ""}-${idx}`}
                       className="py-4 first:pt-0 last:pb-0 flex gap-4 sm:gap-5 items-center"
                     >
                       <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shrink-0 border border-brand-beige/50 shadow-soft">
@@ -99,6 +100,11 @@ export default function CartPage() {
                         <h3 className="font-display font-semibold text-brand-brown text-base sm:text-lg mb-0.5 line-clamp-1">
                           {item.product.name}
                         </h3>
+                        {item.customName && (
+                          <p className="text-brand-brown text-xs font-semibold bg-brand-pink-light/50 px-2.5 py-0.5 rounded-md inline-block my-0.5 border border-brand-pink/40">
+                            ✨ Custom Name: &quot;{item.customName}&quot;
+                          </p>
+                        )}
                         {item.selectedColor && (
                           <p className="text-brand-muted text-xs mb-2">
                             Color:{" "}
@@ -113,7 +119,7 @@ export default function CartPage() {
                           <div className="flex items-center gap-2 bg-brand-cream rounded-2xl border border-brand-beige/80 px-2 py-1 shadow-inner-soft">
                             <button
                               onClick={() =>
-                                updateQuantity(item.product.id, item.quantity - 1)
+                                updateQuantity(item.product.id, item.quantity - 1, item.customName, item.selectedColor)
                               }
                               className="w-7 h-7 rounded-xl hover:bg-white flex items-center justify-center transition-colors text-brand-brown"
                               aria-label="Decrease"
@@ -125,7 +131,7 @@ export default function CartPage() {
                             </span>
                             <button
                               onClick={() =>
-                                updateQuantity(item.product.id, item.quantity + 1)
+                                updateQuantity(item.product.id, item.quantity + 1, item.customName, item.selectedColor)
                               }
                               className="w-7 h-7 rounded-xl hover:bg-white flex items-center justify-center transition-colors text-brand-brown"
                               aria-label="Increase"
@@ -139,7 +145,7 @@ export default function CartPage() {
                               {formatPrice(item.product.price * item.quantity)}
                             </span>
                             <button
-                              onClick={() => removeItem(item.product.id)}
+                              onClick={() => removeItem(item.product.id, item.customName, item.selectedColor)}
                               className="p-2 rounded-full hover:bg-red-50 text-brand-muted hover:text-red-500 transition-colors"
                               aria-label="Remove item"
                             >
@@ -250,9 +256,10 @@ export default function CartPage() {
 
                 <Link
                   href="/checkout"
-                  className="btn-primary w-full py-3.5 text-center justify-center text-base shadow-pink mt-2"
+                  className="btn-primary w-full py-4 text-center justify-center text-base bg-emerald-600 hover:bg-emerald-700 text-white border-none shadow-soft mt-2 gap-2"
                 >
-                  Proceed to Checkout <ArrowRight className="w-4 h-4" />
+                  <MessageCircle className="w-5 h-5 fill-white" />
+                  Proceed to Buy (WhatsApp Order) <ArrowRight className="w-4 h-4" />
                 </Link>
 
                 <div className="pt-2 border-t border-brand-beige/60 space-y-1.5 text-xs text-brand-muted text-center">

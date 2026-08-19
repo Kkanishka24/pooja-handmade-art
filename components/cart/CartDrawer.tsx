@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/utils";
-import { X, ShoppingBag, Minus, Plus, Trash2, ArrowRight, Truck, Sparkles, CheckCircle2 } from "lucide-react";
+import { X, ShoppingBag, Minus, Plus, Trash2, ArrowRight, Truck, Sparkles, CheckCircle2, MessageCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -122,9 +122,9 @@ export default function CartDrawer() {
               </button>
             </div>
           ) : (
-            items.map((item) => (
+            items.map((item, idx) => (
               <div
-                key={item.product.id}
+                key={`${item.product.id}-${item.selectedColor || ""}-${item.customName || ""}-${idx}`}
                 className="flex gap-4 p-3 bg-brand-cream/60 border border-brand-beige/60 rounded-2xl transition-all hover:bg-brand-cream"
               >
                 <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0 border border-brand-beige">
@@ -139,15 +139,25 @@ export default function CartDrawer() {
                   <p className="text-brand-brown-light text-[11px] font-medium uppercase tracking-wider mb-0.5">
                     {item.product.category.name}
                   </p>
-                  <h4 className="font-medium text-brand-brown text-sm leading-tight line-clamp-2 mb-2">
+                  <h4 className="font-medium text-brand-brown text-sm leading-tight line-clamp-2">
                     {item.product.name}
                   </h4>
-                  <div className="flex items-center justify-between">
+                  {item.customName && (
+                    <p className="text-[11px] font-semibold text-brand-brown bg-brand-pink-light/50 px-2 py-0.5 rounded-md inline-block my-1 border border-brand-pink/40">
+                      ✨ Custom Name: &quot;{item.customName}&quot;
+                    </p>
+                  )}
+                  {item.selectedColor && (
+                    <p className="text-[11px] font-medium text-brand-brown-light mt-1">
+                      🎨 Color: <span className="font-semibold text-brand-brown">{item.selectedColor}</span>
+                    </p>
+                  )}
+                  <div className="flex items-center justify-between mt-1">
                     {/* Quantity */}
                     <div className="flex items-center gap-1 bg-white rounded-full p-0.5 shadow-soft border border-brand-beige">
                       <button
                         onClick={() =>
-                          updateQuantity(item.product.id, item.quantity - 1)
+                          updateQuantity(item.product.id, item.quantity - 1, item.customName, item.selectedColor)
                         }
                         className="w-6 h-6 rounded-full hover:bg-brand-cream-dark flex items-center justify-center transition-colors text-brand-brown"
                         aria-label="Decrease quantity"
@@ -159,7 +169,7 @@ export default function CartDrawer() {
                       </span>
                       <button
                         onClick={() =>
-                          updateQuantity(item.product.id, item.quantity + 1)
+                          updateQuantity(item.product.id, item.quantity + 1, item.customName, item.selectedColor)
                         }
                         className="w-6 h-6 rounded-full hover:bg-brand-cream-dark flex items-center justify-center transition-colors text-brand-brown"
                         aria-label="Increase quantity"
@@ -173,7 +183,7 @@ export default function CartDrawer() {
                   </div>
                 </div>
                 <button
-                  onClick={() => removeItem(item.product.id)}
+                  onClick={() => removeItem(item.product.id, item.customName, item.selectedColor)}
                   className="p-1.5 rounded-full hover:bg-red-50 text-brand-brown-light/60 hover:text-red-600 transition-colors self-start shrink-0"
                   aria-label="Remove item"
                 >
@@ -211,9 +221,10 @@ export default function CartDrawer() {
             <Link
               href="/checkout"
               onClick={closeCart}
-              className="btn-primary w-full justify-center text-base py-3.5 shadow-pink"
+              className="btn-primary w-full justify-center text-base py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white border-none shadow-soft gap-2"
             >
-              Checkout <ArrowRight className="w-4 h-4" />
+              <MessageCircle className="w-5 h-5 fill-white" />
+              Proceed to Buy (WhatsApp) <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/cart"

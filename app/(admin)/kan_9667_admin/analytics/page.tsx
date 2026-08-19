@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useState, useEffect } from "react";
 import { TrendingUp, ShoppingBag, Users, Star } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
-import { products, categories } from "@/lib/data";
-
-export const metadata: Metadata = { title: "Admin Analytics" };
+import { Product, Category } from "@/types";
 
 const monthlyData = [
   { month: "Feb", revenue: 8200,  orders: 18 },
@@ -17,6 +17,19 @@ const monthlyData = [
 const maxRevenue = Math.max(...monthlyData.map((d) => d.revenue));
 
 export default function AdminAnalyticsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/products").then((r) => r.ok ? r.json() : { products: [] }),
+      fetch("/api/categories").then((r) => r.ok ? r.json() : { categories: [] }),
+    ]).then(([pData, cData]) => {
+      setProducts(Array.isArray(pData.products) ? pData.products : []);
+      setCategories(Array.isArray(cData.categories) ? cData.categories : []);
+    }).catch(() => {});
+  }, []);
+
   return (
     <div className="space-y-6">
       <div>
@@ -54,7 +67,6 @@ export default function AdminAnalyticsPage() {
                 className="w-full rounded-t-xl bg-gradient-to-t from-brand-pink to-brand-pink-light transition-all duration-700 relative group"
                 style={{ height: `${Math.round((d.revenue / maxRevenue) * 160)}px` }}
               >
-                {/* Tooltip */}
                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-brand-brown text-white text-xs rounded-lg px-2 py-1 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
                   {d.orders} orders
                 </div>
@@ -68,12 +80,10 @@ export default function AdminAnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Categories */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <h2 className="font-display font-semibold text-gray-900 mb-5">
-            Sales by Category
-          </h2>
+          <h2 className="font-display font-semibold text-gray-900 mb-5">Sales by Category</h2>
           <div className="space-y-4">
-            {categories.map((cat, i) => {
-              const pct = [68, 52, 44, 31, 27, 19][i];
+            {categories.slice(0, 6).map((cat, i) => {
+              const pct = [68, 52, 44, 31, 27, 19][i] ?? 10;
               return (
                 <div key={cat.id}>
                   <div className="flex items-center justify-between mb-1.5">
@@ -89,14 +99,15 @@ export default function AdminAnalyticsPage() {
                 </div>
               );
             })}
+            {categories.length === 0 && (
+              <p className="text-sm text-gray-400 text-center py-4">No categories yet</p>
+            )}
           </div>
         </div>
 
         {/* Top Products */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <h2 className="font-display font-semibold text-gray-900 mb-5">
-            Top Performing Products
-          </h2>
+          <h2 className="font-display font-semibold text-gray-900 mb-5">Top Performing Products</h2>
           <div className="space-y-4">
             {products
               .sort((a, b) => b.review_count - a.review_count)
@@ -114,9 +125,7 @@ export default function AdminAnalyticsPage() {
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 line-clamp-1">
-                      {product.name}
-                    </p>
+                    <p className="text-sm font-medium text-gray-900 line-clamp-1">{product.name}</p>
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                       <span>{product.review_count} reviews</span>
                       <span>·</span>
@@ -128,6 +137,9 @@ export default function AdminAnalyticsPage() {
                   </span>
                 </div>
               ))}
+            {products.length === 0 && (
+              <p className="text-sm text-gray-400 text-center py-4">No products yet</p>
+            )}
           </div>
         </div>
       </div>

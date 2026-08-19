@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
@@ -12,22 +12,44 @@ import {
   ArrowLeft,
   Menu,
   X,
+  LogOut,
+  FolderOpen,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 
 const navItems = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/products", label: "Products", icon: Package },
-  { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
-  { href: "/admin/customers", label: "Customers", icon: Users },
-  { href: "/admin/analytics", label: "Analytics", icon: BarChart2 },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/kan_9667_admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/kan_9667_admin/products", label: "Products", icon: Package },
+  { href: "/kan_9667_admin/categories", label: "Categories", icon: FolderOpen },
+  { href: "/kan_9667_admin/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/kan_9667_admin/customers", label: "Customers", icon: Users },
+  { href: "/kan_9667_admin/analytics", label: "Analytics", icon: BarChart2 },
+  { href: "/kan_9667_admin/settings", label: "Settings", icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [adminName, setAdminName] = useState("Admin");
+  const [adminInitial, setAdminInitial] = useState("A");
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        const name = data.user.user_metadata?.full_name || data.user.email || "Admin";
+        setAdminName(name.split(" ")[0]);
+        setAdminInitial(name.charAt(0).toUpperCase());
+      }
+    });
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -125,11 +147,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-brand-pink flex items-center justify-center text-brand-brown text-sm font-bold">
-              P
+              {adminInitial}
             </div>
             <span className="text-sm font-medium text-gray-700 hidden md:block">
-              Pooja
+              {adminName}
             </span>
+            <button
+              onClick={handleSignOut}
+              className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+              title="Sign out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </header>
 

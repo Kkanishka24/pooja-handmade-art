@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/utils";
 import Image from "next/image";
@@ -9,38 +9,37 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
   MapPin,
-  CreditCard,
   CheckCircle,
-  ChevronRight,
-  Lock,
+  MessageCircle,
+  ShoppingBag,
+  ArrowLeft,
   Truck,
+  Sparkles,
+  ExternalLink,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const addressSchema = z.object({
   full_name: z.string().min(2, "Full name is required"),
-  phone: z.string().min(10, "Valid phone number required"),
-  email: z.string().email("Valid email required"),
-  line1: z.string().min(5, "Address is required"),
+  phone: z.string().min(10, "Valid 10-digit mobile number required"),
+  line1: z.string().min(5, "Delivery address is required"),
   line2: z.string().optional(),
   city: z.string().min(2, "City is required"),
   state: z.string().min(2, "State is required"),
   pincode: z.string().length(6, "Valid 6-digit pincode required"),
+  notes: z.string().optional(),
 });
 
 type AddressForm = z.infer<typeof addressSchema>;
 
-const steps = [
-  { id: 1, label: "Address", icon: MapPin },
-  { id: 2, label: "Payment", icon: CreditCard },
-  { id: 3, label: "Confirm", icon: CheckCircle },
-];
+const POOJA_WHATSAPP_NUMBER = "919310261542";
 
 export default function CheckoutPage() {
-  const [step, setStep] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "cod">("razorpay");
-  const [orderPlaced, setOrderPlaced] = useState(false);
-  const [processing, setProcessing] = useState(false);
+  const [orderSent, setOrderSent] = useState(false);
+  const [waLink, setWaLink] = useState("");
+  const [savedData, setSavedData] = useState<AddressForm | null>(null);
+  const router = useRouter();
 
   const { items, getSubtotal, getShipping, getTotal, clearCart } = useCartStore();
   const subtotal = getSubtotal();
@@ -50,46 +49,113 @@ export default function CheckoutPage() {
   const {
     register,
     handleSubmit,
-    getValues,
-    formState: { errors, isValid },
-  } = useForm<AddressForm>({ resolver: zodResolver(addressSchema), mode: "onChange" });
+    formState: { errors },
+  } = useForm<AddressForm>({
+    resolver: zodResolver(addressSchema),
+    defaultValues: {
+      state: "Delhi",
+    },
+  });
 
-  const onAddressSubmit = () => {
-    if (isValid) setStep(2);
+  // Redirect to shop if cart is empty and order hasn't been sent yet
+  useEffect(() => {
+    if (items.length === 0 && !orderSent) {
+      router.push("/shop");
+    }
+  }, [items.length, orderSent, router]);
+
+  const generateWhatsAppMessage = (data: AddressForm) => {
+    let msg = `🛍️ *NEW ORDER - POOJA HANDMADE ART*\n\n`;
+    msg += `👤 *Customer Details:*\n`;
+    msg += `• *Name:* ${data.full_name}\n`;
+    msg += `• *Mobile Number:* ${data.phone}\n`;
+    msg += `• *Address:* ${data.line1}${data.line2 ? `, ${data.line2}` : ""}\n`;
+    msg += `• *City / State:* ${data.city}, ${data.state}\n`;
+    msg += `• *Pincode:* ${data.pincode}\n`;
+    if (data.notes) {
+      msg += `• *Special Notes:* ${data.notes}\n`;
+    }
+
+    msg += `\n📦 *Order Items (${items.length}):*\n`;
+    items.forEach((item, index) => {
+      const colorText = item.selectedColor ? ` (${item.selectedColor})` : "";
+      const customNameText = item.customName ? ` [Custom Name: "${item.customName}"]` : "";
+      msg += `${index + 1}. *${item.product.name}*${colorText}${customNameText} × ${item.quantity} — ₹${
+        item.product.price * item.quantity
+      }\n`;
+    });
+
+    msg += `\n----------------------------------\n`;
+    msg += `💵 *Subtotal:* ₹${subtotal}\n`;
+    msg += `🚚 *Shipping:* ${shipping === 0 ? "FREE" : `₹${shipping}`}\n`;
+    msg += `✨ *Total Amount:* ₹${total}\n\n`;
+    msg += `Please confirm my order and share payment options! 🙏`;
+
+    return encodeURIComponent(msg);
   };
 
-  const handlePayment = async () => {
-    setProcessing(true);
-    await new Promise((r) => setTimeout(r, 2000)); // Simulate Razorpay flow
+  const onSubmit = (data: AddressForm) => {
+    const encodedMessage = generateWhatsAppMessage(data);
+    const whatsappUrl = `https://wa.me/${POOJA_WHATSAPP_NUMBER}?text=${encodedMessage}`;
+
+    setSavedData(data);
+    setWaLink(whatsappUrl);
+    setOrderSent(true);
+
+    // Open WhatsApp in a new tab
+    window.open(whatsappUrl, "_blank");
+
+    // Clear local cart
     clearCart();
-    setOrderPlaced(true);
-    setProcessing(false);
   };
 
-  if (orderPlaced) {
+  if (orderSent && savedData) {
     return (
-      <div className="min-h-screen bg-brand-cream flex items-center justify-center px-4">
-        <div className="text-center max-w-md bg-white p-8 md:p-10 rounded-3xl shadow-card border border-brand-beige">
-          <div className="w-20 h-20 rounded-full bg-brand-green-light/80 flex items-center justify-center mx-auto mb-6 border border-brand-green/30 shadow-soft animate-bounce-soft">
-            <CheckCircle className="w-10 h-10 text-brand-green-dark" />
+      <div className="min-h-screen bg-brand-cream flex items-center justify-center px-4 py-12">
+        <div className="text-center max-w-lg bg-white p-8 sm:p-10 rounded-3xl shadow-card border border-brand-beige w-full">
+          <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6 border border-emerald-300 shadow-soft animate-bounce-soft">
+            <MessageCircle className="w-10 h-10 text-emerald-600 fill-emerald-600" />
           </div>
-          <h1 className="font-display font-bold text-3xl text-brand-brown mb-2">
-            Order Confirmed!
+
+          <span className="badge-pink text-xs font-semibold uppercase tracking-wider mb-2 inline-block">
+            Redirecting to WhatsApp
+          </span>
+
+          <h1 className="font-display font-bold text-3xl text-brand-brown mb-3">
+            Order Sent to WhatsApp!
           </h1>
-          <p className="text-brand-brown-light mb-2 leading-relaxed">
-            Thank you for your order! Your handmade items are being handcrafted with love.
+
+          <p className="text-brand-brown-light text-sm sm:text-base mb-6 leading-relaxed">
+            Thank you, <strong className="text-brand-brown">{savedData.full_name}</strong>! Your order details and delivery address have been sent to Pooja on WhatsApp (+91 93102 61542).
           </p>
-          <p className="text-brand-brown-light/80 text-xs mb-8 bg-brand-cream-dark p-3 rounded-2xl border border-brand-beige">
-            Order confirmation sent to:{" "}
-            <strong className="text-brand-brown font-semibold">{getValues("email") || "your email"}</strong>
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="/order-tracking" className="btn-primary py-3 px-6 shadow-pink">
-              Track Order
+
+          <div className="bg-brand-cream rounded-2xl p-4 mb-6 text-left space-y-2 border border-brand-beige text-xs sm:text-sm">
+            <p className="text-brand-muted font-semibold uppercase tracking-wider text-[11px]">
+              Delivery Summary:
+            </p>
+            <p className="text-brand-brown font-medium">
+              📱 {savedData.phone}
+            </p>
+            <p className="text-brand-brown">
+              📍 {savedData.line1}, {savedData.city}, {savedData.state} - {savedData.pincode}
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary w-full justify-center py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white border-none shadow-soft text-base"
+            >
+              <MessageCircle className="w-5 h-5 fill-white" />
+              Open WhatsApp Chat Again
+              <ExternalLink className="w-4 h-4 ml-1" />
             </a>
-            <a href="/shop" className="btn-secondary py-3 px-6">
+
+            <Link href="/shop" className="btn-secondary w-full justify-center py-3">
               Continue Shopping
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -97,328 +163,230 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="bg-brand-cream min-h-screen">
-      <div className="bg-white border-b border-brand-beige">
-        <div className="container-brand py-8">
-          <h1 className="section-title">Checkout</h1>
-        </div>
-      </div>
+    <div className="bg-brand-cream min-h-screen py-6 md:py-10">
+      <div className="container-brand">
+        {/* Back Link */}
+        <div className="mb-6 flex items-center justify-between">
+          <Link
+            href="/cart"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-brand-brown hover:text-brand-pink transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Cart
+          </Link>
 
-      <div className="container-brand py-10">
-        {/* Step Indicator */}
-        <div className="flex items-center justify-center mb-10">
-          {steps.map((s, i) => (
-            <div key={s.id} className="flex items-center">
-              <div
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300",
-                  step >= s.id
-                    ? "bg-brand-pink text-brand-brown font-semibold"
-                    : "bg-white text-brand-muted border border-brand-beige"
-                )}
-              >
-                <s.icon className="w-4 h-4" />
-                <span className="text-sm">{s.label}</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
+            <MessageCircle className="w-4 h-4 fill-emerald-600 text-emerald-600" />
+            Order directly via WhatsApp
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left: Mobile & Address Form */}
+          <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 shadow-soft border border-brand-beige">
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-brand-beige/60">
+              <div className="w-10 h-10 rounded-2xl bg-brand-pink-light flex items-center justify-center border border-brand-pink/30">
+                <MapPin className="w-5 h-5 text-brand-pink-dark" />
               </div>
-              {i < steps.length - 1 && (
-                <div
-                  className={cn(
-                    "w-8 h-0.5 mx-1 transition-colors duration-300",
-                    step > s.id ? "bg-brand-pink" : "bg-brand-beige"
-                  )}
-                />
-              )}
+              <div>
+                <h1 className="font-display font-bold text-brand-brown text-xl sm:text-2xl">
+                  Delivery Details
+                </h1>
+                <p className="text-brand-muted text-xs">
+                  Enter your address & mobile number to send your order on WhatsApp
+                </p>
+              </div>
             </div>
-          ))}
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Form */}
-          <div className="lg:col-span-2">
-            {/* Step 1: Address */}
-            {step === 1 && (
-              <div className="bg-white rounded-3xl p-6 md:p-8 shadow-soft">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-9 h-9 rounded-full bg-brand-pink-light flex items-center justify-center">
-                    <MapPin className="w-4 h-4 text-brand-pink-dark" />
-                  </div>
-                  <h2 className="font-display font-semibold text-brand-brown text-xl">
-                    Delivery Address
-                  </h2>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
+                    Full Name *
+                  </label>
+                  <input
+                    {...register("full_name")}
+                    placeholder="Enter your full name"
+                    className="input-brand"
+                    id="full-name"
+                  />
+                  {errors.full_name && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.full_name.message}
+                    </p>
+                  )}
                 </div>
 
-                <form onSubmit={handleSubmit(onAddressSubmit)} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
-                        Full Name *
-                      </label>
-                      <input
-                        {...register("full_name")}
-                        placeholder="Priya Sharma"
-                        className="input-brand"
-                        id="full-name"
-                      />
-                      {errors.full_name && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.full_name.message}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
-                        Phone Number *
-                      </label>
-                      <input
-                        {...register("phone")}
-                        placeholder="+91 98765 43210"
-                        className="input-brand"
-                        id="phone"
-                      />
-                      {errors.phone && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.phone.message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
-                      Email Address *
-                    </label>
-                    <input
-                      {...register("email")}
-                      placeholder="priya@example.com"
-                      type="email"
-                      className="input-brand"
-                      id="email"
-                    />
-                    {errors.email && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.email.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
-                      Address Line 1 *
-                    </label>
-                    <input
-                      {...register("line1")}
-                      placeholder="House / Flat no., Street, Area"
-                      className="input-brand"
-                      id="address-line1"
-                    />
-                    {errors.line1 && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.line1.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
-                      Address Line 2
-                    </label>
-                    <input
-                      {...register("line2")}
-                      placeholder="Landmark (optional)"
-                      className="input-brand"
-                      id="address-line2"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
-                        City *
-                      </label>
-                      <input
-                        {...register("city")}
-                        placeholder="Mumbai"
-                        className="input-brand"
-                        id="city"
-                      />
-                      {errors.city && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.city.message}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
-                        State *
-                      </label>
-                      <input
-                        {...register("state")}
-                        placeholder="Maharashtra"
-                        className="input-brand"
-                        id="state"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
-                        Pincode *
-                      </label>
-                      <input
-                        {...register("pincode")}
-                        placeholder="400001"
-                        maxLength={6}
-                        className="input-brand"
-                        id="pincode"
-                      />
-                      {errors.pincode && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.pincode.message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <button type="submit" className="btn-primary w-full justify-center py-4 mt-2">
-                    Continue to Payment <ChevronRight className="w-4 h-4" />
-                  </button>
-                </form>
+                <div>
+                  <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
+                    Mobile / WhatsApp Number *
+                  </label>
+                  <input
+                    {...register("phone")}
+                    placeholder="e.g. 9310261542"
+                    className="input-brand"
+                    id="phone"
+                  />
+                  {errors.phone && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.phone.message}
+                    </p>
+                  )}
+                </div>
               </div>
-            )}
 
-            {/* Step 2: Payment */}
-            {step === 2 && (
-              <div className="bg-white rounded-3xl p-6 md:p-8 shadow-soft">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-9 h-9 rounded-full bg-brand-pink-light flex items-center justify-center">
-                    <CreditCard className="w-4 h-4 text-brand-pink-dark" />
-                  </div>
-                  <h2 className="font-display font-semibold text-brand-brown text-xl">
-                    Payment Method
-                  </h2>
-                </div>
-
-                <div className="space-y-3 mb-6">
-                  {[
-                    {
-                      id: "razorpay",
-                      label: "Online Payment",
-                      subtitle: "UPI, Cards, Net Banking, Wallets",
-                      icon: "💳",
-                    },
-                    {
-                      id: "cod",
-                      label: "Cash on Delivery",
-                      subtitle: "Pay when your order arrives",
-                      icon: "📦",
-                    },
-                  ].map((method) => (
-                    <button
-                      key={method.id}
-                      id={`payment-${method.id}`}
-                      onClick={() => setPaymentMethod(method.id as "razorpay" | "cod")}
-                      className={cn(
-                        "w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 text-left",
-                        paymentMethod === method.id
-                          ? "border-brand-pink bg-brand-pink-light"
-                          : "border-brand-beige hover:border-brand-pink-light"
-                      )}
-                    >
-                      <span className="text-2xl">{method.icon}</span>
-                      <div>
-                        <p className="font-semibold text-brand-brown">
-                          {method.label}
-                        </p>
-                        <p className="text-brand-muted text-xs">
-                          {method.subtitle}
-                        </p>
-                      </div>
-                      <div
-                        className={cn(
-                          "ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center",
-                          paymentMethod === method.id
-                            ? "border-brand-pink bg-brand-pink"
-                            : "border-brand-beige"
-                        )}
-                      >
-                        {paymentMethod === method.id && (
-                          <div className="w-2 h-2 rounded-full bg-white" />
-                        )}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-
-                {paymentMethod === "razorpay" && (
-                  <div className="p-4 bg-brand-cream rounded-2xl mb-6">
-                    <div className="flex items-center gap-2 text-sm text-brand-muted">
-                      <Lock className="w-4 h-4 text-brand-green-dark" />
-                      <span>
-                        Your payment is secured by Razorpay. We never store your
-                        card details.
-                      </span>
-                    </div>
-                  </div>
+              <div>
+                <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
+                  Delivery Address (House / Flat No., Street, Area) *
+                </label>
+                <input
+                  {...register("line1")}
+                  placeholder="e.g. House No. 42, Green Park Main"
+                  className="input-brand"
+                  id="address-line1"
+                />
+                {errors.line1 && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.line1.message}
+                  </p>
                 )}
+              </div>
 
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setStep(1)}
-                    className="btn-ghost border border-brand-beige px-6"
-                  >
-                    Back
-                  </button>
-                  <button
-                    onClick={handlePayment}
-                    disabled={processing}
-                    id="place-order-btn"
-                    className="btn-primary flex-1 justify-center py-4 shadow-pink"
-                  >
-                    {processing ? (
-                      <span className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-brand-brown/30 border-t-brand-brown rounded-full animate-spin" />
-                        Processing...
-                      </span>
-                    ) : (
-                      <>
-                        Place Order — {formatPrice(total)}{" "}
-                        <Lock className="w-4 h-4" />
-                      </>
-                    )}
-                  </button>
+              <div>
+                <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
+                  Landmark / Sector (Optional)
+                </label>
+                <input
+                  {...register("line2")}
+                  placeholder="e.g. Near Metro Station"
+                  className="input-brand"
+                  id="address-line2"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
+                    City *
+                  </label>
+                  <input
+                    {...register("city")}
+                    placeholder="New Delhi"
+                    className="input-brand"
+                    id="city"
+                  />
+                  {errors.city && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.city.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
+                    State *
+                  </label>
+                  <input
+                    {...register("state")}
+                    placeholder="Delhi"
+                    className="input-brand"
+                    id="state"
+                  />
+                  {errors.state && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.state.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
+                    Pincode *
+                  </label>
+                  <input
+                    {...register("pincode")}
+                    placeholder="110016"
+                    maxLength={6}
+                    className="input-brand"
+                    id="pincode"
+                  />
+                  {errors.pincode && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.pincode.message}
+                    </p>
+                  )}
                 </div>
               </div>
-            )}
+
+              <div>
+                <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
+                  Special Notes / Custom Colors (Optional)
+                </label>
+                <textarea
+                  {...register("notes")}
+                  placeholder="Mention any custom color requests or gift note requests here..."
+                  rows={2}
+                  className="input-brand resize-none"
+                  id="notes"
+                />
+              </div>
+
+              <div className="pt-3">
+                <button
+                  type="submit"
+                  id="place-order-whatsapp-btn"
+                  className="btn-primary w-full justify-center py-4 bg-emerald-600 hover:bg-emerald-700 text-white border-none shadow-soft text-base font-semibold transition-all hover:scale-[1.01]"
+                >
+                  <MessageCircle className="w-5 h-5 fill-white" />
+                  Proceed to WhatsApp Order ({formatPrice(total)})
+                </button>
+                <p className="text-center text-xs text-brand-muted mt-2">
+                  Clicking will open WhatsApp with your item list & address pre-filled to message Pooja (+91 93102 61542).
+                </p>
+              </div>
+            </form>
           </div>
 
-          {/* Order Summary */}
-          <div>
-            <div className="bg-white rounded-3xl p-6 shadow-soft sticky top-28">
-              <h3 className="font-display font-semibold text-brand-brown text-lg mb-4">
-                Your Order
-              </h3>
+          {/* Right: Order Summary */}
+          <div className="lg:col-span-5">
+            <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-soft border border-brand-beige sticky top-28">
+              <div className="flex items-center justify-between pb-4 border-b border-brand-beige mb-4">
+                <h3 className="font-display font-bold text-brand-brown text-lg flex items-center gap-2">
+                  <ShoppingBag className="w-5 h-5 text-brand-pink-dark" />
+                  Order Summary
+                </h3>
+                <span className="text-xs font-semibold text-brand-muted">
+                  {items.length} {items.length === 1 ? "item" : "items"}
+                </span>
+              </div>
 
-              <div className="space-y-3 mb-5">
+              <div className="space-y-3 max-h-72 overflow-y-auto pr-1 mb-5 divide-y divide-brand-beige/40">
                 {items.map((item) => (
-                  <div key={item.product.id} className="flex gap-3">
-                    <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0">
+                  <div key={`${item.product.id}-${item.selectedColor || ""}-${item.customName || ""}`} className="pt-3 first:pt-0 flex gap-3 items-center">
+                    <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-brand-beige">
                       <Image
                         src={item.product.images[0]}
                         alt={item.product.name}
                         fill
                         className="object-cover"
                       />
-                      <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-brand-pink text-brand-brown text-[10px] font-bold flex items-center justify-center">
+                      <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-brand-pink text-brand-brown text-[10px] font-bold flex items-center justify-center shadow-soft">
                         {item.quantity}
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-brand-brown text-sm font-medium line-clamp-2">
+                      <p className="text-brand-brown text-sm font-semibold line-clamp-1">
                         {item.product.name}
                       </p>
-                      <p className="text-brand-muted text-xs">
+                      {item.selectedColor && (
+                        <p className="text-[11px] text-brand-muted">
+                          Color: {item.selectedColor}
+                        </p>
+                      )}
+                      <p className="text-brand-muted text-xs mt-0.5">
                         {formatPrice(item.product.price)} × {item.quantity}
                       </p>
                     </div>
-                    <p className="font-semibold text-brand-brown text-sm shrink-0">
+                    <p className="font-display font-bold text-brand-brown text-sm shrink-0">
                       {formatPrice(item.product.price * item.quantity)}
                     </p>
                   </div>
@@ -428,25 +396,25 @@ export default function CheckoutPage() {
               <div className="border-t border-brand-beige pt-4 space-y-2 text-sm">
                 <div className="flex justify-between text-brand-muted">
                   <span>Subtotal</span>
-                  <span>{formatPrice(subtotal)}</span>
+                  <span className="font-medium text-brand-brown">{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-brand-muted">
                   <span>Shipping</span>
-                  <span className={shipping === 0 ? "text-brand-green-dark font-medium" : ""}>
-                    {shipping === 0 ? "Free" : formatPrice(shipping)}
+                  <span className={shipping === 0 ? "text-emerald-700 font-semibold" : "font-medium text-brand-brown"}>
+                    {shipping === 0 ? "FREE" : formatPrice(shipping)}
                   </span>
                 </div>
-                <div className="flex justify-between font-display font-bold text-brand-brown text-base pt-2 border-t border-brand-beige">
-                  <span>Total</span>
-                  <span>{formatPrice(total)}</span>
+                <div className="flex justify-between font-display font-bold text-brand-brown text-lg pt-3 border-t border-brand-beige">
+                  <span>Total Amount</span>
+                  <span className="text-brand-brown text-xl">{formatPrice(total)}</span>
                 </div>
               </div>
 
-              <div className="mt-4 p-3 bg-brand-green-light/40 rounded-2xl flex items-center gap-2 text-xs text-brand-green-dark">
-                <Truck className="w-4 h-4 shrink-0" />
+              <div className="mt-5 p-3.5 bg-emerald-50 rounded-2xl flex items-center gap-2.5 text-xs text-emerald-800 border border-emerald-200">
+                <Truck className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>
                   {shipping === 0
-                    ? "Free shipping applied!"
+                    ? "Free pan-India shipping unlocked!"
                     : `Add ${formatPrice(999 - subtotal)} more for free shipping`}
                 </span>
               </div>

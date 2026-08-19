@@ -1,16 +1,35 @@
 import { NextResponse } from "next/server";
-import { products } from "@/lib/data";
+import { createSupabaseAdminClient } from "@/lib/supabase-server";
+import { mapDbProduct } from "@/lib/db";
+import { Product } from "@/types";
+import { isCategoryMatch } from "@/lib/utils";
 
+// GET: List products from Supabase (only admin-added products)
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const category = searchParams.get("category");
   const search = searchParams.get("search");
   const sort = searchParams.get("sort") || "newest";
   const featured = searchParams.get("featured");
+  const slug = searchParams.get("slug");
+  const limit = searchParams.get("limit");
 
-  let result = [...products];
+  const supabase = createSupabaseAdminClient();
 
-  if (category) result = result.filter((p) => p.category.slug === category);
+  let query = supabase
+    .from("products")
+    .select(`*, categories ( id, name, slug, description, image )`);
+
+  if (slug) query = query.eq("slug", slug);
+
+  const { data, error } = await query;
+
+  let result: Product[] = [];
+  if (!error && data) {
+    result = data.map(mapDbProduct);
+  }
+
+  if (category) result = result.filter((p) => isCategoryMatch(p.category, category, p.customizable));
   if (featured === "true") result = result.filter((p) => p.is_featured);
   if (search) {
     const q = search.toLowerCase();
@@ -18,7 +37,7 @@ export async function GET(request: Request) {
       (p) =>
         p.name.toLowerCase().includes(q) ||
         p.category.name.toLowerCase().includes(q) ||
-        p.tags.some((t) => t.includes(q))
+        p.tags.some((t) => t.toLowerCase().includes(q))
     );
   }
 
@@ -30,6 +49,8 @@ export async function GET(request: Request) {
     default:
       result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   }
+
+  if (limit) result = result.slice(0, Number(limit));
 
   return NextResponse.json({ products: result, total: result.length });
 }

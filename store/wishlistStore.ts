@@ -49,6 +49,7 @@ export const useWishlistStore = create<WishlistStore>()(
     }),
     {
       name: "pooja-wishlist",
+      skipHydration: true,
     }
   )
 );

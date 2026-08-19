@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, Star, ShoppingCart, Sparkles, Feather, Palette, Tag } from "lucide-react";
+import { Heart, Star, ShoppingCart, Sparkles, WashingMachine, Tag } from "lucide-react";
 import { Product } from "@/types";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
@@ -90,9 +90,8 @@ export default function ProductCard({ product, className }: ProductCardProps) {
               />
             </button>
           </div>
-
-          {/* Quick Add to Cart */}
-          <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out z-10 bg-gradient-to-t from-black/20 via-transparent to-transparent">
+{/* Quick Add to Cart (Desktop Hover) */}
+<div className="hidden sm:block absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-10 bg-gradient-to-t from-black/20 via-transparent to-transparent">
             <button
               onClick={handleAddToCart}
               className="w-full btn-primary text-sm py-3 shadow-pink flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 min-h-[44px]"
@@ -104,58 +103,43 @@ export default function ProductCard({ product, className }: ProductCardProps) {
         </div>
 
         {/* Info */}
-        <div className="p-4 md:p-5 flex-1 flex flex-col justify-between">
-          <div className="space-y-1.5">
-            <p className="text-brand-brown-light text-xs font-medium uppercase tracking-wider">{product.category.name}</p>
-            <h3 className="font-display font-semibold text-brand-brown text-sm md:text-base leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-brand-pink-dark transition-colors">
+        <div className="p-3 sm:p-4 md:p-5 flex-1 flex flex-col justify-between">
+          <div className="space-y-1 sm:space-y-1.5">
+            <p className="text-brand-brown-light text-[10px] sm:text-xs font-semibold uppercase tracking-wider">{product.category.name}</p>
+            <h3 className="font-display font-semibold text-brand-brown text-xs sm:text-sm md:text-base leading-snug min-h-[2.2rem] sm:min-h-[2.5rem] group-hover:text-brand-pink-dark transition-colors">
               {product.name}
             </h3>
-
-            {/* Rating */}
-            <div className="flex items-center gap-1 py-1">
-              <div className="flex items-center gap-0.5" aria-label={`Rating: ${product.rating} out of 5 stars`}>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={cn(
-                      "w-3.5 h-3.5",
-                      i < Math.floor(product.rating)
-                        ? "fill-brand-yellow text-brand-yellow"
-                        : "text-brand-beige fill-brand-beige"
-                    )}
-                  />
-                ))}
-              </div>
-              <span className="text-xs text-brand-brown-light font-medium ml-1">
-                ({product.review_count})
-              </span>
-            </div>
           </div>
 
-          <div className="pt-3 mt-auto">
-            {/* Price */}
-            <div className="flex items-baseline gap-2">
-              <span className="font-display font-bold text-brand-brown text-lg">
-                {formatPrice(product.price)}
-              </span>
-              {product.compare_price && (
-                <span className="text-brand-brown-light/70 text-xs line-through">
-                  {formatPrice(product.compare_price)}
+          <div className="pt-2 sm:pt-3 mt-auto">
+            {/* Price & Mobile Cart Button */}
+            <div className="flex items-center justify-between gap-1">
+              <div className="flex items-baseline gap-1.5 flex-wrap">
+                <span className="font-display font-bold text-brand-brown text-base sm:text-lg">
+                  {formatPrice(product.price)}
                 </span>
-              )}
+                {product.compare_price && (
+                  <span className="text-brand-brown-light/70 text-[10px] sm:text-xs line-through">
+                    {formatPrice(product.compare_price)}
+                  </span>
+                )}
+              </div>
+
+              {/* Mobile Quick Add Button */}
+              <button
+                onClick={handleAddToCart}
+                aria-label="Add to Cart"
+                className="sm:hidden p-2 rounded-xl bg-brand-pink text-white shadow-soft active:scale-95 transition-transform"
+              >
+                <ShoppingCart className="w-4 h-4" />
+              </button>
             </div>
 
-            {/* Feature badge slot (fixed equal height) */}
-            <div className="mt-2.5 pt-1 min-h-[28px] flex items-center">
-              {product.customizable ? (
-                <span className="text-[11px] font-semibold text-brand-brown bg-brand-terracotta-light/60 border border-brand-terracotta/30 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
-                  <Palette className="w-3 h-3 text-brand-terracotta shrink-0" /> Custom colors available
-                </span>
-              ) : (
-                <span className="text-[11px] font-medium text-brand-brown-light/80 bg-brand-cream-dark/80 border border-brand-beige/60 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
-                  <Feather className="w-3 h-3 text-brand-green-dark shrink-0" /> 100% Handcrafted felt
-                </span>
-              )}
+            {/* Feature badge slot */}
+            <div className="mt-2 pt-1 min-h-[24px] sm:min-h-[28px] flex items-center">
+              <span className="text-[10px] sm:text-[11px] font-semibold text-brand-brown bg-brand-terracotta-light/60 border border-brand-terracotta/30 px-2 sm:px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
+                <WashingMachine className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-brand-terracotta shrink-0" /> Washable
+              </span>
             </div>
           </div>
         </div>

@@ -5,8 +5,9 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { SlidersHorizontal, Grid3X3, List, X, RotateCcw, Check, Sparkles } from "lucide-react";
 import ProductCard from "@/components/shop/ProductCard";
 import ProductCardSkeleton from "@/components/ui/ProductCardSkeleton";
-import { products, categories } from "@/lib/data";
-import { cn } from "@/lib/utils";
+import { Product, Category } from "@/types";
+import { cn, isCategoryMatch, findCategory } from "@/lib/utils";
+
 
 const sortOptions = [
   { value: "newest", label: "Newest First" },
@@ -30,28 +31,35 @@ function ShopContent() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [selectedCategory, setSelectedCategory] = useState(
-    searchParams.get("category") || "all"
-  );
-  const [sortBy, setSortBy] = useState(searchParams.get("sort") || "newest");
-  const [priceRange, setPriceRange] = useState<[number, number]>(() => {
-    const min = Number(searchParams.get("minPrice")) || 0;
-    const max = Number(searchParams.get("maxPrice")) || 2000;
-    return [min, max];
-  });
-  const [selectedColor, setSelectedColor] = useState<string>(
-    searchParams.get("color") || ""
-  );
-  const [inStockOnly, setInStockOnly] = useState<boolean>(
-    searchParams.get("inStock") === "true"
-  );
-  const [searchQuery, setSearchQuery] = useState(
-    searchParams.get("search") || ""
-  );
+  // URL searchParams as single source of truth
+  const selectedCategory = searchParams.get("category") || "all";
+  const sortBy = searchParams.get("sort") || "newest";
+  const minPrice = Number(searchParams.get("minPrice")) || 0;
+  const maxPrice = Number(searchParams.get("maxPrice")) || 2000;
+  const priceRange: [number, number] = [minPrice, maxPrice];
+  const selectedColor = searchParams.get("color") || "";
+  const inStockOnly = searchParams.get("inStock") === "true";
+  const searchQuery = searchParams.get("search") || "";
 
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [view, setView] = useState<"grid" | "list">("grid");
-  const [isLoading, setIsLoading] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch products and categories from Supabase (admin-added only)
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/products").then((res) => (res.ok ? res.json() : { products: [] })),
+      fetch("/api/categories").then((res) => (res.ok ? res.json() : { categories: [] })),
+    ])
+      .then(([pData, cData]) => {
+        setProducts(Array.isArray(pData.products) ? pData.products : []);
+        setCategories(Array.isArray(cData.categories) ? cData.categories : []);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   // Lock body scroll on mobile when filter sidebar is toggled
   useEffect(() => {
@@ -65,51 +73,60 @@ function ShopContent() {
     };
   }, [filtersOpen]);
 
-  // Sync state from URL when navigating client-side (e.g. search from modal)
-  useEffect(() => {
-    setSelectedCategory(searchParams.get("category") || "all");
-    setSortBy(searchParams.get("sort") || "newest");
-    const min = Number(searchParams.get("minPrice")) || 0;
-    const max = Number(searchParams.get("maxPrice")) || 2000;
-    setPriceRange([min, max]);
-    setSelectedColor(searchParams.get("color") || "");
-    setInStockOnly(searchParams.get("inStock") === "true");
-    setSearchQuery(searchParams.get("search") || "");
-  }, [searchParams]);
-
-  // Sync URL search params when filters change
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (selectedCategory !== "all") params.set("category", selectedCategory);
-    if (sortBy !== "newest") params.set("sort", sortBy);
-    if (priceRange[0] > 0) params.set("minPrice", priceRange[0].toString());
-    if (priceRange[1] < 2000) params.set("maxPrice", priceRange[1].toString());
-    if (selectedColor) params.set("color", selectedColor);
-    if (inStockOnly) params.set("inStock", "true");
-    if (searchQuery) params.set("search", searchQuery);
+  // Helper to update URL search parameters
+  const updateFilters = (updates: Record<string, string | number | boolean | null>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([key, val]) => {
+      if (val === null || val === "" || val === "all" || val === false || (key === "sort" && val === "newest")) {
+        params.delete(key);
+      } else {
+        params.set(key, String(val));
+      }
+    });
 
     const queryString = params.toString();
     const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
     router.replace(newUrl, { scroll: false });
-  }, [selectedCategory, sortBy, priceRange, selectedColor, inStockOnly, searchQuery, pathname, router]);
+  };
+
+  const handleCategoryChange = (catSlug: string) => {
+    updateFilters({ category: catSlug });
+  };
+// Simulate short loading skeleton when switching categories or sorting
+const handleCategoryChange = (catSlug: string) => {
+  setIsLoading(true);
+  setSelectedCategory(catSlug);
+  updateFilters({ category: catSlug });
+  setTimeout(() => setIsLoading(false), 250);
+};
+
+const handleSortChange = (sortVal: string) => {
+  updateFilters({ sort: sortVal });
+};
+
+const handlePriceRangeChange = (range: [number, number]) => {
+  updateFilters({
+    minPrice: range[0] > 0 ? range[0] : null,
+    maxPrice: range[1] < 2000 ? range[1] : null,
+  });
+};
+
+  const handleColorChange = (color: string) => {
+    updateFilters({ color: color === selectedColor ? null : color });
+  };
+
+  const handleInStockChange = (checked: boolean) => {
+    updateFilters({ inStock: checked ? "true" : null });
+  };
+
+  const clearAllFilters = () => {
+    router.replace(pathname, { scroll: false });
+  };
 
   // Live category product count
   const getCategoryProductCount = (categorySlug: string) => {
     if (categorySlug === "all") return products.length;
-    return products.filter((p) => p.category.slug === categorySlug).length;
-  };
-
-  // Simulate short loading skeleton when switching categories or sorting
-  const handleCategoryChange = (catSlug: string) => {
-    setIsLoading(true);
-    setSelectedCategory(catSlug);
-    setTimeout(() => setIsLoading(false), 250);
-  };
-
-  const handleSortChange = (sortVal: string) => {
-    setIsLoading(true);
-    setSortBy(sortVal);
-    setTimeout(() => setIsLoading(false), 200);
+    return products.filter((p) => isCategoryMatch(p.category, categorySlug, p.customizable)).length;
   };
 
   // Filter products
@@ -127,7 +144,7 @@ function ShopContent() {
     }
 
     if (selectedCategory !== "all") {
-      result = result.filter((p) => p.category.slug === selectedCategory);
+      result = result.filter((p) => isCategoryMatch(p.category, selectedCategory, p.customizable));
     }
 
     result = result.filter(
@@ -165,7 +182,7 @@ function ShopContent() {
     }
 
     return result;
-  }, [selectedCategory, sortBy, priceRange, selectedColor, inStockOnly, searchQuery]);
+  }, [products, selectedCategory, sortBy, priceRange, selectedColor, inStockOnly, searchQuery]);
 
   // Active filters list
   const hasActiveFilters =
@@ -175,16 +192,6 @@ function ShopContent() {
     selectedColor !== "" ||
     inStockOnly ||
     searchQuery !== "";
-
-  const clearAllFilters = () => {
-    setIsLoading(true);
-    setSelectedCategory("all");
-    setPriceRange([0, 2000]);
-    setSelectedColor("");
-    setInStockOnly(false);
-    setSearchQuery("");
-    setTimeout(() => setIsLoading(false), 200);
-  };
 
   return (
     <div className="bg-brand-cream min-h-screen">
@@ -196,8 +203,7 @@ function ShopContent() {
               <h1 className="section-title">
                 {selectedCategory === "all"
                   ? "All Handcrafted Products"
-                  : categories.find((c) => c.slug === selectedCategory)?.name ||
-                    "Shop"}
+                  : findCategory(categories, selectedCategory)?.name || "Shop"}
               </h1>
               <p className="section-subtitle text-sm mt-1 flex items-center gap-2">
                 <span>{filtered.length} handcrafted items</span>
@@ -274,7 +280,7 @@ function ShopContent() {
                           onClick={() => handleCategoryChange(cat.slug)}
                           className={cn(
                             "w-full text-left px-3 py-2 rounded-xl text-sm transition-colors duration-200 flex items-center justify-between",
-                            selectedCategory === cat.slug
+                            isCategoryMatch(cat, selectedCategory)
                               ? "bg-brand-pink text-brand-brown font-semibold shadow-soft"
                               : "text-brand-muted hover:bg-brand-cream-dark hover:text-brand-brown"
                           )}
@@ -302,7 +308,7 @@ function ShopContent() {
                       ].map((option) => (
                         <button
                           key={option.label}
-                          onClick={() => setPriceRange(option.range)}
+                          onClick={() => handlePriceRangeChange(option.range)}
                           className={cn(
                             "w-full text-left px-3 py-2 rounded-xl text-sm transition-colors duration-200",
                             priceRange[0] === option.range[0] &&
@@ -315,7 +321,7 @@ function ShopContent() {
                         </button>
                       ))}
                       <button
-                        onClick={() => setPriceRange([0, 2000])}
+                        onClick={() => handlePriceRangeChange([0, 2000])}
                         className="w-full text-left px-3 py-2 rounded-xl text-xs text-brand-muted hover:bg-brand-cream-dark transition-colors"
                       >
                         Any Price
@@ -334,7 +340,7 @@ function ShopContent() {
                         return (
                           <button
                             key={color.name}
-                            onClick={() => setSelectedColor(isSelected ? "" : color.name)}
+                            onClick={() => handleColorChange(color.name)}
                             className={cn(
                               "w-7 h-7 rounded-full border-2 transition-all flex items-center justify-center relative shadow-soft",
                               isSelected
@@ -360,7 +366,7 @@ function ShopContent() {
                       <input
                         type="checkbox"
                         checked={inStockOnly}
-                        onChange={(e) => setInStockOnly(e.target.checked)}
+                        onChange={(e) => handleInStockChange(e.target.checked)}
                         className="w-4 h-4 rounded text-brand-pink focus:ring-brand-pink border-brand-beige cursor-pointer"
                       />
                       <span>In Stock Only</span>
@@ -422,7 +428,7 @@ function ShopContent() {
                       onClick={() => handleCategoryChange(cat.slug)}
                       className={cn(
                         "w-full text-left px-3 py-2 rounded-xl text-sm transition-colors duration-200 flex items-center justify-between",
-                        selectedCategory === cat.slug
+                        isCategoryMatch(cat, selectedCategory)
                           ? "bg-brand-pink text-brand-brown font-semibold shadow-soft"
                           : "text-brand-muted hover:bg-brand-cream-dark hover:text-brand-brown"
                       )}
@@ -450,7 +456,7 @@ function ShopContent() {
                   ].map((option) => (
                     <button
                       key={option.label}
-                      onClick={() => setPriceRange(option.range)}
+                      onClick={() => handlePriceRangeChange(option.range)}
                       className={cn(
                         "w-full text-left px-3 py-2 rounded-xl text-sm transition-colors duration-200",
                         priceRange[0] === option.range[0] &&
@@ -463,7 +469,7 @@ function ShopContent() {
                     </button>
                   ))}
                   <button
-                    onClick={() => setPriceRange([0, 2000])}
+                    onClick={() => handlePriceRangeChange([0, 2000])}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs text-brand-muted hover:bg-brand-cream-dark transition-colors"
                   >
                     Any Price
@@ -482,7 +488,7 @@ function ShopContent() {
                     return (
                       <button
                         key={color.name}
-                        onClick={() => setSelectedColor(isSelected ? "" : color.name)}
+                        onClick={() => handleColorChange(color.name)}
                         className={cn(
                           "w-7 h-7 rounded-full border-2 transition-all flex items-center justify-center relative shadow-soft",
                           isSelected
@@ -508,7 +514,7 @@ function ShopContent() {
                   <input
                     type="checkbox"
                     checked={inStockOnly}
-                    onChange={(e) => setInStockOnly(e.target.checked)}
+                    onChange={(e) => handleInStockChange(e.target.checked)}
                     className="w-4 h-4 rounded text-brand-pink focus:ring-brand-pink border-brand-beige cursor-pointer"
                   />
                   <span>In Stock Only</span>
@@ -587,9 +593,9 @@ function ShopContent() {
 
                 {selectedCategory !== "all" && (
                   <span className="chip chip-active text-xs flex items-center gap-1">
-                    Category: {categories.find((c) => c.slug === selectedCategory)?.name}
+                    Category: {findCategory(categories, selectedCategory)?.name || selectedCategory}
                     <button
-                      onClick={() => setSelectedCategory("all")}
+                      onClick={() => updateFilters({ category: "all" })}
                       className="hover:text-red-600 ml-1"
                       aria-label="Remove category filter"
                     >
@@ -602,7 +608,7 @@ function ShopContent() {
                   <span className="chip chip-active text-xs flex items-center gap-1">
                     Price: ₹{priceRange[0]} - ₹{priceRange[1]}
                     <button
-                      onClick={() => setPriceRange([0, 2000])}
+                      onClick={() => handlePriceRangeChange([0, 2000])}
                       className="hover:text-red-600 ml-1"
                       aria-label="Remove price filter"
                     >
@@ -615,7 +621,7 @@ function ShopContent() {
                   <span className="chip chip-active text-xs flex items-center gap-1">
                     Color: {selectedColor}
                     <button
-                      onClick={() => setSelectedColor("")}
+                      onClick={() => handleColorChange("")}
                       className="hover:text-red-600 ml-1"
                       aria-label="Remove color filter"
                     >
@@ -628,7 +634,7 @@ function ShopContent() {
                   <span className="chip chip-active text-xs flex items-center gap-1">
                     In Stock Only
                     <button
-                      onClick={() => setInStockOnly(false)}
+                      onClick={() => handleInStockChange(false)}
                       className="hover:text-red-600 ml-1"
                       aria-label="Remove in-stock filter"
                     >
@@ -641,7 +647,7 @@ function ShopContent() {
                   <span className="chip chip-active text-xs flex items-center gap-1">
                     Search: &quot;{searchQuery}&quot;
                     <button
-                      onClick={() => setSearchQuery("")}
+                      onClick={() => updateFilters({ search: null })}
                       className="hover:text-red-600 ml-1"
                       aria-label="Remove search query"
                     >
@@ -659,8 +665,8 @@ function ShopContent() {
               </div>
             )}
 
-            {/* Product Grid / Skeleton Loaders */}
-            {isLoading ? (
+            {/* Product Grid */}
+            {loading ? (
               <div
                 className={cn(
                   "grid gap-4 md:gap-6",

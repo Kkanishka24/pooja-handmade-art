@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Search, X, ArrowRight, History, Sparkles } from "lucide-react";
-import { products } from "@/lib/data";
+import { Product } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,8 +17,17 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Load products from the database
+  useEffect(() => {
+    fetch("/api/products")
+      .then((res) => (res.ok ? res.json() : { products: [] }))
+      .then((data) => setProducts(data.products || []))
+      .catch(() => setProducts([]));
+  }, []);
 
   // Load recent searches on mount
   useEffect(() => {
