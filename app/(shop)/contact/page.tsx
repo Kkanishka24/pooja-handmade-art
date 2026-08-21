@@ -22,11 +22,11 @@ const faqs = [
   },
   {
     q: "What is your shipping policy?",
-    a: "We ship pan India via reputed couriers. Standard delivery takes 4–7 business days. Orders above ₹999 qualify for free shipping.",
+    a: "We ship pan India via reputed couriers. Standard delivery takes 4–7 business days. A shipping charge of ₹99 is applicable on orders below ₹1,499. Orders above ₹1,499 qualify for free shipping.",
   },
   {
     q: "Can I return or exchange a product?",
-    a: "We accept returns within 7 days of delivery for unopened items. Personalized items cannot be returned unless damaged.",
+    a: "We accept returns only for defective or damaged products. Kindly contact us within 48 hours of delivery with photographic evidence of the defect. Personalised and non-defective items are not eligible for return or exchange.",
   },
   {
     q: "Are the materials safe for babies?",

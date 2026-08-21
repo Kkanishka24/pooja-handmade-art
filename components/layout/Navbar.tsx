@@ -102,7 +102,7 @@ export default function Navbar() {
       {/* Announcement Banner */}
       <div className="bg-brand-pink text-brand-brown text-center py-2 px-4 text-xs sm:text-sm font-semibold tracking-wide flex items-center justify-center gap-1.5 flex-wrap">
 
-        <span>Free Shipping on Orders Above ₹999 &nbsp;|&nbsp; Personalised Name Designs &nbsp;|&nbsp; Washable &amp; Durable</span>
+        <span>Free Shipping on Orders Above ₹1499 &nbsp;|&nbsp; Personalised Name Designs &nbsp;|&nbsp; Washable &amp; Durable</span>
 
       </div>
 

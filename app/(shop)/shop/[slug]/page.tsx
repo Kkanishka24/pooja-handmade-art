@@ -363,9 +363,9 @@ export default function ProductDetailPage({
             {/* Trust Badges Bar */}
             <div className="grid grid-cols-3 gap-2 py-2.5 px-4 bg-brand-cream/80 rounded-2xl border border-brand-beige/60">
               {[
-                { icon: Truck, label: "Free Shipping\nabove ₹999" },
+                { icon: Truck, label: "Free Shipping\nabove ₹1499" },
                 { icon: Shield, label: "100% Secure\nPayment" },
-                { icon: RefreshCw, label: "Easy 7-Day\nReturns" },
+                { icon: RefreshCw, label: "Only Defective\nProducts Returnable" },
               ].map(({ icon: Icon, label }) => (
                 <div key={label} className="flex flex-col items-center text-center">
                   <Icon className="w-4 h-4 text-brand-pink-dark mb-0.5" />

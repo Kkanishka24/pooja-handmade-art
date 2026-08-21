@@ -102,7 +102,7 @@ export const useCartStore = create<CartStore>()(
 
       getShipping: () => {
         const subtotal = get().getSubtotal();
-        return subtotal >= 999 ? 0 : 79;
+        return subtotal >= 1499 ? 0 : 99;
       },
 
       getTotal: () => {

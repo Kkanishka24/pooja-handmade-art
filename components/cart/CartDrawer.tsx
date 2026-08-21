@@ -73,14 +73,14 @@ export default function CartDrawer() {
         </div>
 
         {/* Free shipping banner */}
-        {subtotal < 999 && (
+        {subtotal < 1499 && (
           <div className="px-5 py-3 bg-brand-green-light/40 border-b border-brand-green-light/60">
             <div className="flex items-center gap-2 text-sm">
               <Truck className="w-4.5 h-4.5 text-brand-green-dark shrink-0" />
               <span className="text-brand-brown text-xs md:text-sm">
                 Add{" "}
                 <strong className="text-brand-green-dark font-semibold">
-                  {formatPrice(999 - subtotal)}
+                  {formatPrice(1499 - subtotal)}
                 </strong>{" "}
                 more for free shipping!
               </span>
@@ -88,12 +88,12 @@ export default function CartDrawer() {
             <div className="mt-2 h-2 bg-white rounded-full overflow-hidden border border-brand-green-light/50">
               <div
                 className="h-full bg-brand-green rounded-full transition-all duration-500 shadow-soft"
-                style={{ width: `${Math.min((subtotal / 999) * 100, 100)}%` }}
+                style={{ width: `${Math.min((subtotal / 1499) * 100, 100)}%` }}
               />
             </div>
           </div>
         )}
-        {subtotal >= 999 && (
+        {subtotal >= 1499 && (
           <div className="px-5 py-2.5 bg-brand-green-light/60 text-xs md:text-sm text-brand-brown font-semibold text-center border-b border-brand-green-light flex items-center justify-center gap-1.5">
             <CheckCircle2 className="w-4 h-4 text-brand-green-dark inline" /> You&apos;ve unlocked free shipping!
           </div>

@@ -81,7 +81,13 @@ export default function OrderTrackingPage() {
           </span>
           <h1 className="section-title text-4xl mb-4">Where&apos;s My Order?</h1>
           <p className="section-subtitle max-w-md mx-auto">
-            Enter your order number to see real-time updates on your handmade package
+            Enter your Order ID or registered phone number to view the current
+            status of your shipment.
+          </p>
+          <p className="mt-3 text-xs text-brand-brown/70 max-w-sm mx-auto leading-relaxed">
+            📌 Please note: Your Order ID and registered phone number are
+            shared with you via WhatsApp at the time of order confirmation.
+            Kindly refer to that message to track your order.
           </p>
         </div>
       </div>
@@ -105,14 +111,14 @@ export default function OrderTrackingPage() {
               </div>
               <div>
                 <label className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5 block">
-                  Email Address <span className="text-brand-muted font-normal normal-case">(optional, for verification)</span>
+                  Phone Number <span className="text-brand-muted font-normal normal-case">(as shared via WhatsApp)</span>
                 </label>
                 <input
-                  type="email"
+                  type="tel"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="email used for order"
-                  id="order-email-input"
+                  placeholder="Phone number registered with your order"
+                  id="order-phone-input"
                   className="input-brand"
                 />
               </div>

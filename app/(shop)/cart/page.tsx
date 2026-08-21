@@ -231,14 +231,14 @@ export default function CartPage() {
                 </div>
 
                 {/* Free shipping notice */}
-                {subtotal < 999 && (
+                {subtotal < 1499 && (
                   <div className="p-3 bg-white rounded-2xl border border-brand-green/30 shadow-soft">
                     <div className="flex items-center gap-2 text-xs text-brand-brown mb-2">
                       <Truck className="w-3.5 h-3.5 text-brand-green-dark shrink-0" />
                       <span>
                         Add{" "}
                         <strong className="text-brand-green-dark">
-                          {formatPrice(999 - subtotal)}
+                          {formatPrice(1499 - subtotal)}
                         </strong>{" "}
                         more for free shipping!
                       </span>
@@ -247,7 +247,7 @@ export default function CartPage() {
                       <div
                         className="h-full bg-brand-green transition-all duration-300"
                         style={{
-                          width: `${Math.min(100, (subtotal / 999) * 100)}%`,
+                          width: `${Math.min(100, (subtotal / 1499) * 100)}%`,
                         }}
                       />
                     </div>
@@ -265,7 +265,7 @@ export default function CartPage() {
                 <div className="pt-2 border-t border-brand-beige/60 space-y-1.5 text-xs text-brand-muted text-center">
                   <div className="flex items-center justify-center gap-1.5">
                     <Truck className="w-3.5 h-3.5 text-brand-pink-dark" />
-                    <span>Free shipping on orders above ₹999</span>
+                    <span>Free shipping on orders above ₹1,499</span>
                   </div>
                   <div className="flex items-center justify-center gap-1.5">
                     <span>🔒</span>

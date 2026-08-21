@@ -415,7 +415,7 @@ export default function CheckoutPage() {
                 <span>
                   {shipping === 0
                     ? "Free pan-India shipping unlocked!"
-                    : `Add ${formatPrice(999 - subtotal)} more for free shipping`}
+                    : `Add ${formatPrice(1499 - subtotal)} more for free shipping`}
                 </span>
               </div>
             </div>
